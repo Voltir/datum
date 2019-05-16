@@ -1,5 +1,5 @@
 // Versions
-val catsV = "1.4.0"
+val catsV = "1.6.0"
 val drosteV = "0.6.0"
 
 lazy val scala212 = "2.12.8"
@@ -9,6 +9,7 @@ lazy val supportedScalaVersions = List(scala212, scala211)
 // Settings
 lazy val commonSettings = Seq(
   name := "datum",
+  version := "0.2.0-SNAPSHOT",
   crossScalaVersions := supportedScalaVersions,
   organization := "io.github.voltir",
   resolvers += Resolver.sonatypeRepo("releases"),
@@ -19,15 +20,23 @@ lazy val commonSettings = Seq(
     "-unchecked",
     "-Ypartial-unification",
     "-Ypatmat-exhaust-depth",
-    "40"
+    "40",
+    "-Ywarn-dead-code",
+    "-Ywarn-infer-any",
+    "-Ywarn-unused:implicits",
+    "-Ywarn-unused:imports",
+    "-Ywarn-unused:locals", // Warn if a local definition is unused.
+    "-Ywarn-unused:params", // Warn if a value parameter is unused.
+    "-Ywarn-unused:patvars", // Warn if a variable bound in a pattern is unused.
+    "-Ywarn-unused:privates" // Warn if a private member is unused.
+    //"-Xfatal-warnings"
   ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsV,
     "org.typelevel" %% "alleycats-core" % catsV,
     "io.higherkindness" %% "droste-core" % drosteV,
-    "com.lihaoyi" %% "pprint" % "0.5.2",
-    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
-    "com.47deg" %% "scalacheck-toolbox-datetime" % "0.2.5" % Test
+    "com.lihaoyi" %% "pprint" % "0.5.3",
+    "org.scalatest" %% "scalatest" % "3.0.7" % Test
   )
 )
 
@@ -51,9 +60,8 @@ lazy val gen = (project in file("gen"))
   .settings(
     name := "datum-gen",
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.5",
-      "io.chrisdavenport" %% "cats-scalacheck" % "0.1.0",
-      "com.47deg" %% "scalacheck-toolbox-datetime" % "0.2.5"
+      "org.scalatest" %% "scalatest" % "3.0.7",
+      "io.chrisdavenport" %% "cats-scalacheck" % "0.1.1"
     )
   )
   .settings(sonatypePublish)

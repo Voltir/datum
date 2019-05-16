@@ -10,7 +10,7 @@ import datum.ujsonlib.implicits._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 
 class UjsonLibSpec extends WordSpec with Checkers with Matchers {
 

@@ -7,8 +7,7 @@ import datum.patterns.data.Data
 import cats.syntax.either._
 import cats.instances.either._
 import qq.droste.data.Fix
-import qq.droste.data.prelude._
-import qq.droste.{Algebra, AlgebraM}
+import qq.droste.AlgebraM
 
 trait CompileBoolean {
 

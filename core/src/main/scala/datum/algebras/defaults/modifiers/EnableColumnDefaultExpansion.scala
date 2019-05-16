@@ -24,7 +24,6 @@ object EnableColumnDefaultExpansion {
   def enable: (String, Attribute) = key -> property(true)
 
   private def columnExpansionFn(
-    inp: Data,
     dataValues: Vector[Data],
     columnFns: Vector[Column[Data => Data]]
   ): Data = {
@@ -48,8 +47,8 @@ object EnableColumnDefaultExpansion {
       case AttrF(_, RowF(elements, _)) =>
         inp =>
           Fix.un[DataF](inp) match {
-            case RowValue(values) => columnExpansionFn(inp, values, elements)
-            case EmptyValue       => columnExpansionFn(inp, Vector.empty, elements)
+            case RowValue(values) => columnExpansionFn(values, elements)
+            case EmptyValue       => columnExpansionFn(Vector.empty, elements)
             case _                => inp
           }
       case _ => identity

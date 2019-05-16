@@ -1,13 +1,12 @@
 package datum.ujsonlib.data
 import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
-import java.time.format.DateTimeFormatter
 import java.util.Base64
 
 import cats.Traverse
 import datum.patterns.data._
 import datum.patterns.{schemas, data => d}
 import datum.patterns.schemas._
-import qq.droste.{Algebra, Coalgebra, scheme}
+import qq.droste.{Algebra, scheme}
 import cats.syntax.either._
 import cats.instances.either._
 import cats.instances.vector._
@@ -136,8 +135,8 @@ object ReadJs {
   ): Algebra[SchemaF, Js.Value => Either[String, Data]] = Algebra { schema => js =>
     val fn = alg(schema)
     fn(js) match {
-      case Left(err) if schema.attributes.contains(Optional.key) => Right(d.empty)
-      case otherwise                                             => otherwise
+      case Left(_) if schema.attributes.contains(Optional.key) => Right(d.empty)
+      case otherwise                                           => otherwise
     }
   }
 

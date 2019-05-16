@@ -58,7 +58,7 @@ class CompileDefaults(rules: AttributeCompilationRules) {
       case v @ ValueF(BooleanType, attrs) if attrs.contains(key) =>
         withType(BooleanType) { using(rules.boolean(attrs(key)), v) }
 
-      case v @ ValueF(_, attrs) => using(empty, v)
+      case v @ ValueF(_, _) => using(empty, v)
 
       case ObjF(fields, attrs) =>
         fields.collectFirst {
@@ -66,6 +66,7 @@ class CompileDefaults(rules: AttributeCompilationRules) {
         } getOrElse {
           val valid = fields.mapValues {
             case Right(ok) => ok
+            case Left(err) => throw new Exception(s"Impossible: $err")
           }
           using(empty, ObjF(valid, attrs))
         }

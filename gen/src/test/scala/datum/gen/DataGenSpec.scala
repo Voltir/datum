@@ -8,8 +8,7 @@ import datum.patterns.schemas.{IntType, Schema, TextType}
 import org.scalacheck.Arbitrary
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
-import org.scalatest.prop.Checkers
-
+import org.scalatestplus.scalacheck.Checkers
 
 class DataGenSpec extends WordSpec with Checkers with Matchers {
 

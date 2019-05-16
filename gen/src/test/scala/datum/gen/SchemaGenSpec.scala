@@ -6,11 +6,11 @@ import datum.gen.algebras.SchemaGen._
 import datum.modifiers.Optional
 import datum.patterns.{data, schemas}
 import datum.patterns.attributes._
-import datum.patterns.schemas.{BooleanType, IntType, Schema, SchemaF}
+import datum.patterns.schemas.{BooleanType, IntType, Schema}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import qq.droste.syntax.all._
 
 class SchemaGenSpec extends WordSpec with Checkers with Matchers {

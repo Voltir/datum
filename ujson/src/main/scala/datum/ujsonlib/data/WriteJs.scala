@@ -7,7 +7,7 @@ import java.time.ZoneId
 import datum.patterns.{data, schemas}
 import datum.patterns.data.{Data, DataF}
 import datum.patterns.schemas._
-import qq.droste.{Algebra, RAlgebra, scheme}
+import qq.droste.{Algebra, scheme}
 import qq.droste.syntax.project._
 import ujson.Js
 
