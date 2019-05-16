@@ -38,9 +38,19 @@ object Corresponds {
         case _ => false
       }
 
-    case UnionF(alternatives, _) =>
-      d =>
-        alternatives.exists(pred => pred(d))
+    case NamedUnionF(alternatives, _) =>
+      _.project match {
+        case NamedUnionValue(selected, v) =>
+          alternatives.get(selected).exists(_.apply(v))
+        case _ => false
+      }
+
+    case IndexedUnionF(alternatives, _) =>
+      _.project match {
+        case IndexedUnionValue(idx, v) if idx >= 0 && idx < alternatives.length =>
+          alternatives(idx)(v)
+        case _ => false
+      }
 
     case ArrayF(fn, _) =>
       _.project match {
@@ -55,8 +65,8 @@ object Corresponds {
     case ValueF(DoubleType, _)        => matchValue { case DoubleValue(_)    => true }
     case ValueF(BooleanType, _)       => matchValue { case BooleanValue(_)   => true }
     case ValueF(DateType, _)          => matchValue { case DateValue(_)      => true }
-    case ValueF(TimestampType, _)     => matchValue { case TimestampValue(_)   => true }
-    case ValueF(DateTimeType, _)      => matchValue { case DateTimeValue(_) => true }
+    case ValueF(TimestampType, _)     => matchValue { case TimestampValue(_) => true }
+    case ValueF(DateTimeType, _)      => matchValue { case DateTimeValue(_)  => true }
     case ValueF(ZonedDateTimeType, _) => matchValue { case ZonedTimeValue(_) => true }
     case ValueF(BytesType, _)         => matchValue { case BytesValue(_)     => true }
 

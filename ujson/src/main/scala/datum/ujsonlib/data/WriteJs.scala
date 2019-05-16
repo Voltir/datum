@@ -70,44 +70,42 @@ object WriteJs {
     case RowF(elements, _) =>
       _.project match {
         case data.RowValue(rows) =>
-          var nulls = 0
           val empty = Stream.continually(data.empty)
-          val result = elements.zip(rows.toStream #::: empty).map {
-            case (col, d) =>
-              val r = col.value.apply(d)
-              if (r == Js.Null) nulls += 1
-              r
+          elements.zip(rows.toStream #::: empty).map {
+            case (col, d) => col.value.apply(d)
           }
-          if (nulls != elements.length || rows.isEmpty) result else Js.Null
-
         case _ => Js.Null
       }
 
     case ArrayF(fn, _) =>
       _.project match {
-        case data.RowValue(values) =>
-          val result = values.map(fn)
-          if (result.exists(_ != Js.Null) || result.isEmpty) result else Js.Null
-        case _ => Js.Null
+        case data.RowValue(values) => values.map(fn)
+        case _                     => Js.Null
       }
 
-    case UnionF(options, _) =>
-      d =>
-        val iter = options.toIterator
-        var result: Js.Value = Js.Null
-        var idx = -1
-        while (iter.hasNext && result == Js.Null) {
-          val fn = iter.next()
-          println(s"Attempting to use $d")
-          println(s"Was ${fn(d)}")
-          result = fn(d)
-          idx += 1
-        }
-        if (idx == options.length) idx = -1
-        Js.Arr(Js.Num(idx), result)
+    case NamedUnionF(alts, _) =>
+      _.project match {
+        case data.NamedUnionValue(selection, value) =>
+          alts
+            .get(selection)
+            .map { fn =>
+              Js.Obj(
+                selection -> fn(value)
+              )
+            }
+            .getOrElse(Js.Null)
+        case _ =>
+          Js.Null
+      }
 
-    case todo =>
-      println("TODO! " + todo)
+    case IndexedUnionF(alts, _) =>
+      _.project match {
+        case data.IndexedUnionValue(idx, v) if idx >= 0 && idx < alts.length =>
+          val fn = alts(idx)
+          Js.Arr(Js.Num(idx), fn(v))
+      }
+
+    case _ =>
       _ =>
         Js.Null
   }

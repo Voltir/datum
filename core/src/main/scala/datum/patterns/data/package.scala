@@ -29,6 +29,14 @@ package object data {
     Fix(RowValue(Vector(elements: _*)))
   }
 
+  def union(selection: String, element: Data): Data = {
+    Fix(NamedUnionValue(selection, element))
+  }
+
+  def indexed(idx: Int, element: Data): Data = {
+    Fix(IndexedUnionValue(idx, element))
+  }
+
   def text(value: String): Data = {
     Fix[DataF](TextValue(value))
   }

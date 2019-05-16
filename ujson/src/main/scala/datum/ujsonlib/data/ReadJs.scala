@@ -84,7 +84,7 @@ object ReadJs {
           d.obj(builder.result())
         }
 
-      case _ => Left("todo: ObjF")
+      case _ => Left("Invalid Obj")
     }
 
     case RowF(elements, _) => {
@@ -96,29 +96,38 @@ object ReadJs {
         }
         results.map(d.row)
 
-      case _ => Left("todo: RowF")
+      case _ => Left("Invalid Row")
     }
 
     case ArrayF(fn, _) => {
       case Js.Arr(values) =>
         Traverse[Vector].traverse(values.toVector)(fn).map(d.row)
       case _ =>
-        Left("todo: ArrayF")
+        Left("Invalid Array")
     }
 
-    case UnionF(unionFns, _) => {
-      case Js.Arr(z) if z.length == 2 =>
-        val tag = z(0).num.toInt
-        val value = z(1)
-        if (tag != -1 && tag < unionFns.length) {
-          println(s"GOOD $tag")
-          unionFns(tag)(value)
-        } else {
-          println("BAD")
-          Left("Invalid Union")
+    case NamedUnionF(alts, _) => {
+      case Js.Obj(fields) =>
+        val selection = fields.keySet.head
+        alts(selection)(fields(selection)).map { res =>
+          d.union(selection, res)
         }
-      case nope =>
-        Left("todo: UnionF")
+      case _ => Left("Invalid Union Value")
+    }
+
+    case IndexedUnionF(alts, _) => {
+      case Js.Arr(values) if values.length == 2 =>
+        try {
+          val idx = values(0).num.toInt
+          val fn = alts(idx)
+          fn(values(1)).map { res =>
+            d.indexed(idx, res)
+          }
+        } catch {
+          case e: Exception => Left(s"Invalid Indexed Union: ${e.getMessage}")
+        }
+      case _ =>
+        Left("Invalid IndexedUnion Value")
     }
   }
 

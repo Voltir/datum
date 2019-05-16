@@ -17,7 +17,7 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
 
   val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
 
-  val ASeed: Gen[Seed] = Gen.oneOf(AnObj, AnArray, ATable, AUnion).map { Seed(_, 5) }
+  val ASeed: Gen[Seed] = Gen.oneOf(AnObj, AnArray, ATable, AUnion, AnIndexedUnion).map { Seed(_, 5) }
 
   "Schema Generation" should {
     "support optional values" in {
@@ -35,13 +35,14 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
     }
 
     "support optional union types" in {
-      val requiredUnion = schemas.union()(schemas.value(IntType), schemas.value(BooleanType))
-      val optUnion1 = schemas.union(Optional.key -> property(true))(schemas.value(IntType), schemas.value(BooleanType))
+      val requiredUnion = schemas.indexed()(schemas.value(IntType), schemas.value(BooleanType))
+      val optUnion1 =
+        schemas.indexed(Optional.key -> property(true))(schemas.value(IntType), schemas.value(BooleanType))
       val optUnion2 =
-        schemas.union()(schemas.value(IntType, Optional.key -> property(true)), schemas.value(BooleanType))
+        schemas.indexed()(schemas.value(IntType, Optional.key -> property(true)), schemas.value(BooleanType))
       correspondsTo(requiredUnion)(data.empty) shouldBe false
       correspondsTo(optUnion1)(data.empty) shouldBe true
-      correspondsTo(optUnion2)(data.empty) shouldBe true
+      correspondsTo(optUnion2)(data.indexed(0, data.empty)) shouldBe true
     }
   }
 }

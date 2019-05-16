@@ -1,12 +1,9 @@
 package datum.gen.algebras
 
-import java.time.ZonedDateTime
-
 import cats.Traverse
 import datum.patterns.data
 import datum.patterns.data.Data
 import datum.patterns.schemas._
-import com.fortysevendeg.scalacheck.datetime.jdk8.ArbitraryJdk8._
 import datum.modifiers.Optional
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -16,6 +13,8 @@ import qq.droste.{Algebra, AlgebraM, scheme}
 object DataGen {
 
   private val helpers: AlgebraM[Gen, SchemaF, Data] = AlgebraM {
+
+    // If the value is empty, sometimes drop the key from the output
     case ObjF(fields, _) =>
       Gen.chooseNum(0.0, 1.0).map { x =>
         data.obj(fields.filter {
@@ -78,10 +77,17 @@ object DataGen {
     case ArrayF(element, _) =>
       Gen.resize(5, Gen.containerOf[Vector, Data](element).map(data.row))
 
-    case UnionF(alternatives, _) =>
-      Gen.chooseNum(0, alternatives.length - 1).flatMap {
-        alternatives(_)
-      }
+    case NamedUnionF(alternatives, _) =>
+      for {
+        name <- Gen.oneOf(alternatives.keySet.toSeq)
+        v <- alternatives(name)
+      } yield data.union(name, v)
+
+    case IndexedUnionF(alternatives, _) =>
+      for {
+        idx <- Gen.chooseNum(0, alternatives.length - 1)
+        v <- alternatives(idx)
+      } yield data.indexed(idx, v)
 
     case other =>
       Traverse[SchemaF].sequence(other).flatMap(helpers(_))

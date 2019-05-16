@@ -49,23 +49,24 @@ class SchemaGen(
     })
   }
 
-  /*
-   * Union may not contain another union
-   * Union may not contain an array
-   */
-  private def genUnion(level: Int): Gen[SchemaF[Seed]] = {
+  private def genIndexed(level: Int): Gen[SchemaF[Seed]] = {
     Gen.resize(
       3,
       Gen.nonEmptyContainerOf[Vector, Seed](nest(level)).map { alts =>
-        val valid = alts.map {
-          case Seed(AUnion, l)  => Seed(AValue, l)
-          case Seed(AnArray, l) => Seed(AValue, l)
-          case Seed(n, l)       => Seed(n, l)
-        }
-
-        UnionF[Seed](valid)
+        IndexedUnionF[Seed](alts)
       }
     )
+  }
+
+  private def genUnion(level: Int): Gen[SchemaF[Seed]] = {
+    val alts = for {
+      k <- Gen.resize(5, Gen.alphaLowerStr)
+      s <- nest(level)
+    } yield (k, s)
+
+    Gen.resize(maxFields, Gen.nonEmptyListOf(alts)).map { choices =>
+      NamedUnionF[Seed](SortedMap(choices: _*))
+    }
   }
 
   private def genArray(level: Int): Gen[SchemaF[Seed]] = {
@@ -75,11 +76,12 @@ class SchemaGen(
   }
 
   val coalgebra: CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM {
-    case Seed(AValue, _)      => genValue
-    case Seed(AnObj, level)   => genObj(level)
-    case Seed(ATable, level)  => genTable(level)
-    case Seed(AUnion, level)  => genUnion(level)
-    case Seed(AnArray, level) => genArray(level)
+    case Seed(AValue, _)             => genValue
+    case Seed(AnObj, level)          => genObj(level)
+    case Seed(ATable, level)         => genTable(level)
+    case Seed(AUnion, level)         => genUnion(level)
+    case Seed(AnIndexedUnion, level) => genIndexed(level)
+    case Seed(AnArray, level)        => genArray(level)
   }
 }
 
@@ -105,10 +107,11 @@ object SchemaGen {
   object next {
 
     val default: Gen[Next] = Gen.frequency(
-      4 -> Gen.const(AValue),
+      5 -> Gen.const(AValue),
       1 -> Gen.const(AnObj),
       1 -> Gen.const(ATable),
       1 -> Gen.const(AUnion),
+      1 -> Gen.const(AnIndexedUnion),
       1 -> Gen.const(AnArray)
     )
   }
@@ -118,6 +121,7 @@ object SchemaGen {
   final case object AnObj extends Next
   final case object ATable extends Next
   final case object AUnion extends Next
+  final case object AnIndexedUnion extends Next
   final case object AnArray extends Next
 
   case class Seed(next: Next, level: Int)

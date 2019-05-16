@@ -13,7 +13,7 @@ package object schemas {
   }
 
   def obj(attributes: (String, Attribute)*)(fields: (String, Schema)*): Schema = {
-    Fix(ObjF(SortedMap(fields: _*),  Map(attributes: _*)))
+    Fix(ObjF(SortedMap(fields: _*), Map(attributes: _*)))
   }
 
   def row(attributes: AttributeMap = Map.empty)(elements: Column[Schema]*): Schema = {
@@ -24,12 +24,24 @@ package object schemas {
     Fix(RowF(Vector(elements: _*), Map(attributes: _*)))
   }
 
-  def union(attributes: AttributeMap = Map.empty)(alternatives: Schema*): Schema = {
-    Fix(UnionF(Vector(alternatives: _*), attributes))
+  def col(name: String, schema: Schema): Column[Schema] = {
+    Column(schema, Some(name))
   }
 
-  def union(attributes: (String, Attribute)*)(alternatives: Schema*): Schema = {
-    Fix(UnionF(Vector(alternatives: _*),  Map(attributes: _*)))
+  def union(attributes: AttributeMap = Map.empty)(alternatives: (String, Schema)*): Schema = {
+    Fix(NamedUnionF(SortedMap(alternatives: _*), attributes))
+  }
+
+  def union(attributes: (String, Attribute)*)(alternatives: (String, Schema)*): Schema = {
+    Fix(NamedUnionF(SortedMap(alternatives: _*), Map(attributes: _*)))
+  }
+
+  def indexed(attributes: AttributeMap = Map.empty)(alternatives: Schema*): Schema = {
+    Fix(IndexedUnionF(Vector(alternatives: _*), attributes))
+  }
+
+  def indexed(attributes: (String, Attribute)*)(alternatives: Schema*): Schema = {
+    Fix(IndexedUnionF(Vector(alternatives: _*), Map(attributes: _*)))
   }
 
   def array(attributes: AttributeMap = Map.empty)(conforms: Schema): Schema = {

@@ -38,9 +38,15 @@ trait SchemaReadWriter { self: AttributeReadWriter =>
         "attributes" -> writeJs(attributes)
       )
 
-    case UnionF(alternatives, attributes) =>
+    case NamedUnionF(alternatives, attributes) =>
       Js.Obj(
         "union" -> alternatives,
+        "attributes" -> writeJs(attributes)
+      )
+
+    case IndexedUnionF(alternatives, attributes) =>
+      Js.Obj(
+        "indexed" -> alternatives,
         "attributes" -> writeJs(attributes)
       )
 
@@ -68,13 +74,17 @@ trait SchemaReadWriter { self: AttributeReadWriter =>
       val attrs = readJs[Map[String, Attribute]](fields("attributes"))
       ArrayF(fields("array"), attrs)
 
-    case Js.Obj(fields) if fields.contains("union") =>
-      val attrs = readJs[Map[String, Attribute]](fields("attributes"))
-      UnionF(fields("union").arr.toVector, attrs)
-
     case Js.Obj(fields) if fields.contains("fields") =>
       val attrs = readJs[Map[String, Attribute]](fields("attributes"))
       ObjF(SortedMap(fields("fields").obj.toSeq: _*), attrs)
+
+    case Js.Obj(fields) if fields.contains("union") =>
+      val attrs = readJs[Map[String, Attribute]](fields("attributes"))
+      NamedUnionF(SortedMap(fields("union").obj.toSeq: _*), attrs)
+
+    case Js.Obj(fields) if fields.contains("indexed") =>
+      val attrs = readJs[Map[String, Attribute]](fields("attributes"))
+      IndexedUnionF(fields("indexed").arr.to[Vector], attrs)
 
     case fuuu =>
       println("============ FUUUUUUU =========")
