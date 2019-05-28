@@ -2,9 +2,10 @@ package datum.gen
 import datum.algebras.Corresponds
 import datum.gen.algebras.DataGen
 import datum.modifiers.Optional
-import datum.patterns.data.Data
+import datum.patterns.data.{BytesValue, Data, ZonedTimeValue}
 import datum.patterns.{data, schemas}
-import datum.patterns.schemas.{IntType, Schema, TextType}
+import datum.patterns.schemas._
+import qq.droste.syntax.project._
 import org.scalacheck.Arbitrary
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
@@ -54,6 +55,36 @@ class DataGenSpec extends WordSpec with Checkers with Matchers {
       check {
         forAll { data: Data =>
           testFn(data)
+        }
+      }
+    }
+
+    "generate zoned date time" in {
+      val schema = schemas.value(ZonedDateTimeType)
+      val dates = DataGen.define(DataGen.algebra)
+
+      implicit val arb: Arbitrary[Data] = Arbitrary(dates(schema))
+      check {
+        forAll { data: Data =>
+          data.project match {
+            case ZonedTimeValue(_) => true
+            case _                 => false
+          }
+        }
+      }
+    }
+
+    "generate bytes values" in {
+      val schema = schemas.value(BytesType)
+      val dates = DataGen.define(DataGen.algebra)
+
+      implicit val arb: Arbitrary[Data] = Arbitrary(dates(schema))
+      check {
+        forAll { data: Data =>
+          data.project match {
+            case BytesValue(_) => true
+            case _             => false
+          }
         }
       }
     }

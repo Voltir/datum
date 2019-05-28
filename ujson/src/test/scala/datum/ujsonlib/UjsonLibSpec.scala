@@ -88,6 +88,16 @@ class UjsonLibSpec extends WordSpec with Checkers with Matchers {
       fromJs(toJs(c1)) shouldBe Right(c1)
     }
 
+    "roundtrip binary data" in {
+      implicit val schema: Schema = s.obj()("a" -> s.value(BytesType), "b" -> s.value(BytesType))
+      val toJs = WriteJs.define()(schema)
+      val fromJs = ReadJs.define()(schema)
+      check {
+        forAll { data: Data =>
+          fromJs(toJs(data)) == Right(data)
+        }
+      }
+    }
     "be able to encode/decode arbitrary data of some schema" in {
       val generator = SchemaGen.default
 

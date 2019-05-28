@@ -33,7 +33,10 @@ object DataGen {
   }
 
   import scala.collection.JavaConverters._
-  private val allzones = java.time.ZoneId.getAvailableZoneIds.asScala.toVector.map(java.time.ZoneId.of)
+  // JDK <= 1.8 has the following bug https://bugs.openjdk.java.net/browse/JDK-8138664
+  // So DataGen will avoid generating timezones with GMT0 specified as the tz
+  private val allzones =
+    java.time.ZoneId.getAvailableZoneIds.asScala.filter(_ != "GMT0").toVector.map(java.time.ZoneId.of)
   private val zones = Gen.oneOf(allzones)
 
   val algebra: Algebra[SchemaF, Gen[Data]] = Algebra {

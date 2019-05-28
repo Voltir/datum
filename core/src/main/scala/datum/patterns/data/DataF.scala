@@ -23,7 +23,18 @@ final case class FloatValue(value: Float) extends DataF[Nothing]
 final case class DoubleValue(value: Double) extends DataF[Nothing]
 final case class TextValue(value: String) extends DataF[Nothing]
 final case class BooleanValue(value: Boolean) extends DataF[Nothing]
-final case class BytesValue(value: Array[Byte]) extends DataF[Nothing]
+
+// Arrays use reference equality by default, which breaks things
+final case class BytesValue(value: Array[Byte]) extends DataF[Nothing] {
+  override def equals(o: Any): Boolean = o match {
+    case BytesValue(x) => java.util.Arrays.equals(value, x)
+    case _             => false
+  }
+  override def hashCode(): Int = {
+    value.hashCode() + 1
+  }
+}
+
 final case class DateValue(value: LocalDate) extends DataF[Nothing]
 final case class TimestampValue(value: Instant) extends DataF[Nothing]
 final case class DateTimeValue(value: LocalDateTime) extends DataF[Nothing]

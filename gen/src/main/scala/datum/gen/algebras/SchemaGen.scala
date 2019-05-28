@@ -96,11 +96,11 @@ object SchemaGen {
       DoubleType,
       FloatType,
       TextType,
-      //  BytesType, - Using == to compare byte arrays seems to be wonky
+      BytesType,
       BooleanType,
       DateType,
-      DateTimeType
-      // ZonedDateTimeType - the gen for zonetime is buggy! can generate invalid strings :/
+      DateTimeType,
+      ZonedDateTimeType
     )
   }
 
