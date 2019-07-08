@@ -15,7 +15,7 @@ import scala.collection.mutable
  *  2) Generates the default data value from the attribute value
  *  3) Returns the annotated SchemaF tree with default values attached
  */
-class CompileDefaults(rules: AttributeCompilationRules) {
+class CompileDefaults(rules: PropertyCompilationRules) {
 
   // Mutable class to collect data about errors for a given Schema
   private[this] case class ErrorFound(error: String) {
@@ -94,5 +94,5 @@ class CompileDefaults(rules: AttributeCompilationRules) {
 }
 
 object CompileDefaults {
-  def apply(rules: AttributeCompilationRules = DefaultCompilationRules): CompileDefaults = new CompileDefaults(rules)
+  def apply(rules: PropertyCompilationRules = DefaultCompilationRules): CompileDefaults = new CompileDefaults(rules)
 }

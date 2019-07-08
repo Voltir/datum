@@ -3,7 +3,7 @@ package datum.algebras
 import datum.modifiers.Optional
 import datum.patterns.schemas.{IntType, Schema, TextType}
 import datum.patterns.data.Data
-import datum.patterns.{attributes, data, schemas}
+import datum.patterns.{data, schemas}
 import org.scalatest.{Matchers, WordSpec}
 
 class CorrespondsSpec extends WordSpec with Matchers {

@@ -1,6 +1,6 @@
 package datum.algebras.defaults.modifiers
 
-import datum.patterns.attributes._
+import datum.patterns.properties._
 import datum.patterns.data
 import datum.patterns.data.{Data, DataF, EmptyValue, RowValue}
 import datum.patterns.schemas.{Column, RowF, SchemaF}
@@ -21,7 +21,7 @@ object EnableColumnDefaultExpansion {
 
   val key: String = "enable-default-expansion"
 
-  def enable: (String, Attribute) = key -> property(true)
+  def enable: (String, Property) = key -> true.prop
 
   private def columnExpansionFn(
     dataValues: Vector[Data],
