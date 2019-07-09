@@ -162,7 +162,7 @@ object SchemaGen {
     )
 
   def optional(alg: CoalgebraM[Gen, SchemaF, Seed]): CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM { seed =>
-    alg(seed).flatMap(schema => Gen.oneOf(schema, schema.withAttributes(Optional.enable)))
+    alg(seed).flatMap(schema => Gen.oneOf(schema, schema.withProperties(Optional.enable)))
   }
 
   def define(coalg: CoalgebraM[Gen, SchemaF, Seed] = default.coalgebra): Seed => Gen[Schema] = {
