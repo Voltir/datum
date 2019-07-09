@@ -27,7 +27,7 @@ object PropertyGen {
   }
 
   private val genNext: Gen[Next] = Gen.frequency(
-    1 -> genPrimitive,
+    2 -> genPrimitive,
     1 -> Gen.const(ACollectionProp)
   )
 
@@ -57,8 +57,13 @@ object PropertyGen {
       })
   }
 
-  def define(level: Int = 2) = {
+  def define(level: Int = 1): Gen[(String, Property)] = {
+    val key = Gen.resize(5, Gen.alphaLowerStr)
     val fn = scheme.anaM(coalgebra)
-    fn(Seed(ACollectionProp, level))
+    val value = genNext.flatMap(n => fn(Seed(n, level)))
+    for {
+      k <- key
+      v <- value
+    } yield k -> v
   }
 }
