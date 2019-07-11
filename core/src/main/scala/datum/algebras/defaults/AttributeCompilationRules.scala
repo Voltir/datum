@@ -19,7 +19,7 @@ trait CompileBoolean {
 trait CompileInteger {
 
   def integer(property: Property): Either[String, Data] = property match {
-    case IntProp(value) => Either.catchNonFatal(data.integer(value.toInt)).leftMap(_.getMessage)
+    case NumProp(value) => Either.catchNonFatal(data.integer(value.toInt)).leftMap(_.getMessage)
     case _              => Left("Invalid Property - expected a numeric property")
   }
 
@@ -28,7 +28,7 @@ trait CompileInteger {
 trait CompileText {
 
   def text(property: Property): Either[String, Data] = property match {
-    case StringProp(value) => Right(data.text(value))
+    case TextProp(value) => Right(data.text(value))
     case _                 => Left("Invalid Property - expected a text")
   }
 
@@ -38,7 +38,7 @@ trait CompiledZonedTime {
   import java.time._
 
   val algebra: AlgebraM[Either[String, ?], PropertyF, Data] = AlgebraM[Either[String, ?], PropertyF, Data] {
-    case StringPropF(value) =>
+    case TextPropF(value) =>
       Either
         .catchNonFatal {
           val result = ZonedDateTime.parse(value, DateTimeFormatter.ISO_ZONED_DATE_TIME)

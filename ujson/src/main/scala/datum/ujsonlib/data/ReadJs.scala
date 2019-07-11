@@ -6,6 +6,7 @@ import cats.Traverse
 import datum.patterns.data._
 import datum.patterns.{schemas, data => d}
 import datum.patterns.schemas._
+import datum.patterns.properties._
 import higherkindness.droste.{Algebra, scheme}
 import cats.syntax.either._
 import cats.instances.either._
@@ -134,8 +135,8 @@ object ReadJs {
   ): Algebra[SchemaF, ujson.Value => Either[String, Data]] = Algebra { schema => js =>
     val fn = alg(schema)
     fn(js) match {
-      case Left(_) if schema.attributes.contains(Optional.key) => Right(d.empty)
-      case otherwise                                           => otherwise
+      case Left(_) if schema.properties.get(Optional.key).contains(true.prop) => Right(d.empty)
+      case otherwise                                                          => otherwise
     }
   }
 

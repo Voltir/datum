@@ -12,8 +12,8 @@ object PropertyGen {
 
   sealed trait Next extends Serializable with Product
   case object ABoolProp extends Next
-  case object AnIntProp extends Next
-  case object AStringProp extends Next
+  case object ANumProp extends Next
+  case object ATextProp extends Next
   case object ACollectionProp extends Next
 
   case class Seed(next: Next, level: Int)
@@ -21,8 +21,8 @@ object PropertyGen {
   private val genPrimitive: Gen[Next] = {
     Gen.frequency(
       2 -> Gen.const(ABoolProp),
-      1 -> Gen.const(AnIntProp),
-      1 -> Gen.const(AStringProp)
+      1 -> Gen.const(ANumProp),
+      1 -> Gen.const(ATextProp)
     )
   }
 
@@ -43,9 +43,9 @@ object PropertyGen {
   }
 
   val coalgebra: CoalgebraM[Gen, PropertyF, Seed] = CoalgebraM[Gen, PropertyF, Seed] {
-    case Seed(ABoolProp, _)   => arbitrary[Boolean].map(BoolPropF)
-    case Seed(AnIntProp, _)   => arbitrary[Int].map(IntPropF)
-    case Seed(AStringProp, _) => arbitrary[String].map(StringPropF)
+    case Seed(ABoolProp, _) => arbitrary[Boolean].map(BoolPropF)
+    case Seed(ANumProp, _)  => arbitrary[Double].map(NumPropF)
+    case Seed(ATextProp, _) => arbitrary[String].map(TextPropF)
     case Seed(ACollectionProp, level) =>
       val genProps = for {
         k <- Gen.resize(5, Gen.alphaLowerStr)
@@ -53,7 +53,7 @@ object PropertyGen {
       } yield (k, s)
 
       Gen.resize(3, Gen.nonEmptyListOf(genProps).map { props =>
-        CollectionPropertyF[Seed](SortedMap(props: _*))
+        CollectionPropF[Seed](SortedMap(props: _*))
       })
   }
 
