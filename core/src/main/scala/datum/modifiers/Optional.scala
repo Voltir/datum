@@ -1,8 +1,8 @@
 package datum.modifiers
 
-import datum.patterns.attributes._
+import datum.patterns.properties._
 
 object Optional {
   val key: String = "optional"
-  val enable: (String, Attribute) = key -> property(true)
+  val enable: (String, Property) = key -> true.prop
 }

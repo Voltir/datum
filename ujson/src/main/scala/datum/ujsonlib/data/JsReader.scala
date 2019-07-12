@@ -1,4 +1,6 @@
 package datum.ujsonlib.data
+
+import scala.language.higherKinds
 import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
 import java.util.Base64
 
@@ -16,6 +18,7 @@ import datum.modifiers.Optional
 import scala.collection.immutable.SortedMap
 
 class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
+  import JsReader._
 
   private def fromJs(tpe: schemas.Type, js: ujson.Value): M[Data] = {
     (tpe, js) match {
@@ -52,7 +55,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         }
 
       case _ =>
-        M.raiseError(new Exception(s"Expected ${schemas.Type.asString(tpe)} but got ${pprint.apply(js, 2)}"))
+        M.raiseError(JsTypeException(tpe, js))
     }
   }
 
@@ -73,7 +76,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
           d.obj(builder.result())
         }
 
-      case _ => M.raiseError(new Exception("Invalid Obj"))
+      case _ => M.raiseError(SchemaMismatchException("Invalid Obj"))
     }
 
     case RowF(elements, _) => {
@@ -85,7 +88,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         }
         results.map(d.row)
 
-      case _ => M.raiseError(new Exception("Invalid Row"))
+      case _ => M.raiseError(SchemaMismatchException("Invalid Row"))
     }
 
     case ArrayF(fn, _) => {
@@ -97,7 +100,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         M.map(wat)(d.row)
         Traverse[Vector].traverse(values.toVector)(fn).map(d.row)
       case _ =>
-        M.raiseError(new Exception("Invalid Array"))
+        M.raiseError(SchemaMismatchException("Invalid Array"))
     }
 
     case NamedUnionF(alts, _) => {
@@ -106,7 +109,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         alts(selection)(fields(selection)).map { res =>
           d.union(selection, res)
         }
-      case _ => M.raiseError(new Exception("Invalid Union Value"))
+      case _ => M.raiseError(SchemaMismatchException("Invalid Union Value"))
     }
 
     case IndexedUnionF(alts, _) => {
@@ -120,21 +123,20 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         } catch {
           case e: Exception => M.raiseError(e)
         }
-      case _ => M.raiseError(new Exception("Invalid IndexedUnion Value"))
+      case _ => M.raiseError(SchemaMismatchException("Invalid IndexedUnion Value"))
     }
   }
 
-  def optional(
-    alg: Algebra[SchemaF, ujson.Value => M[Data]]
-  ): Algebra[SchemaF, ujson.Value => M[Data]] = Algebra { schema => js =>
-    val fn = alg(schema)
-    val isOpt = schema.attributes.contains(Optional.key)
-    (isOpt, js.isNull) match {
-      case (true, true)  => M.pure(d.empty)
-      case (true, false) => fn(js).recover { case _ => d.empty }
-      case (false, _)    => fn(js)
+  def optional(alg: Algebra[SchemaF, ujson.Value => M[Data]]): Algebra[SchemaF, ujson.Value => M[Data]] =
+    Algebra { schema => js =>
+      val fn = alg(schema)
+      val isOpt = schema.properties.get(Optional.key).contains(true)
+      (isOpt, js.isNull) match {
+        case (true, true)  => M.pure(d.empty)
+        case (true, false) => fn(js).recover { case _ => d.empty }
+        case (false, _)    => fn(js)
+      }
     }
-  }
 
   def define(schema: Schema): ujson.Value => M[Data] = defineUsing(default)(schema)
 
@@ -145,6 +147,13 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
 }
 
 object JsReader {
+
+  sealed abstract class JsReaderException(msg: String) extends Exception(msg)
+
+  case class JsTypeException(tpe: Type, js: ujson.Value)
+    extends JsReaderException(s"Expected ${schemas.Type.asString(tpe)} but got ${pprint.apply(js, 2)}")
+
+  case class SchemaMismatchException(msg: String) extends JsReaderException(msg)
 
   def apply[M[_]](implicit M: MonadError[M, Throwable]): JsReader[M] = new JsReader[M]()
 

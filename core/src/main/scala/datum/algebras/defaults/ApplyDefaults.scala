@@ -56,7 +56,7 @@ object ApplyDefaults {
           }
 
       // Handle case for replacing empty inputs with default value
-      case AttrF(default, schema) if schema.attributes.contains(key) =>
+      case AttrF(default, schema) if schema.properties.contains(key) =>
         inp =>
           Fix.un[DataF](inp) match {
             case data.EmptyValue => default

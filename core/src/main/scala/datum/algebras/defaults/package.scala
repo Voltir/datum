@@ -1,8 +1,8 @@
 package datum.algebras
-import datum.patterns.attributes._
+import datum.patterns.properties.Property
 
 package object defaults {
   val key: String = "default"
 
-  def use(attribute: Attribute): (String, Attribute) = key -> attribute
+  def use(property: Property): (String, Property) = key -> property
 }

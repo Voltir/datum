@@ -4,6 +4,7 @@ import cats.Traverse
 import datum.patterns.data
 import datum.patterns.data.Data
 import datum.patterns.schemas._
+import datum.patterns.properties._
 import datum.modifiers.Optional
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -37,6 +38,7 @@ object DataGen {
   // So DataGen will avoid generating timezones with GMT0 specified as the tz
   private val allzones =
     java.time.ZoneId.getAvailableZoneIds.asScala.filter(_ != "GMT0").toVector.map(java.time.ZoneId.of)
+
   private val zones = Gen.oneOf(allzones)
 
   val algebra: Algebra[SchemaF, Gen[Data]] = Algebra {
@@ -97,7 +99,7 @@ object DataGen {
   }
 
   def optional(alg: Algebra[SchemaF, Gen[Data]]): Algebra[SchemaF, Gen[Data]] = Algebra { schema =>
-    if (schema.attributes.contains(Optional.key)) {
+    if (schema.properties.get(Optional.key).contains(true.prop)) {
       Gen.frequency(1 -> Gen.const(data.empty), 5 -> alg(schema))
     } else {
       alg(schema)

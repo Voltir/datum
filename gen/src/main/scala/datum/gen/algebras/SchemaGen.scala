@@ -12,9 +12,12 @@ class SchemaGen(
   allowedValueTypes: Vector[Type] = SchemaGen.types.all,
   next: Gen[SchemaGen.Next] = SchemaGen.next.default,
   maxFields: Int = 5,
-  uniqueColumnNames: Boolean = false
+  uniqueColumnNames: Boolean = false,
+  generateProperties: Boolean = true,
 ) {
   import SchemaGen._
+
+  private val genProperty = PropertyGen.define()
 
   private def nest(level: Int): Gen[Seed] = {
     for {
@@ -24,6 +27,15 @@ class SchemaGen(
       }
       l <- if (level > 1) Gen.chooseNum(0, level - 1) else Gen.const(0)
     } yield Seed(n, l)
+  }
+
+  private def addProperties(gen: Gen[SchemaF[Seed]]): Gen[SchemaF[Seed]] = {
+    if (generateProperties) {
+      for {
+        schema <- gen
+        props <- Gen.resize(3, Gen.nonEmptyListOf(genProperty))
+      } yield schema.withProperties(props: _*)
+    } else gen
   }
 
   private val genValue: Gen[SchemaF[Seed]] = Gen.oneOf(allowedValueTypes).map { x =>
@@ -103,12 +115,12 @@ class SchemaGen(
   }
 
   val coalgebra: CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM {
-    case Seed(AValue, _)             => genValue
-    case Seed(AnObj, level)          => genObj(level)
-    case Seed(ARow, level)           => genRow(level)
-    case Seed(AUnion, level)         => genUnion(level)
-    case Seed(AnIndexedUnion, level) => genIndexed(level)
-    case Seed(AnArray, level)        => genArray(level)
+    case Seed(AValue, _)             => addProperties(genValue)
+    case Seed(AnObj, level)          => addProperties(genObj(level))
+    case Seed(ARow, level)           => addProperties(genRow(level))
+    case Seed(AUnion, level)         => addProperties(genUnion(level))
+    case Seed(AnIndexedUnion, level) => addProperties(genIndexed(level))
+    case Seed(AnArray, level)        => addProperties(genArray(level))
   }
 }
 
@@ -158,11 +170,12 @@ object SchemaGen {
   val simple =
     new SchemaGen(
       allowedValueTypes = Vector(IntType, BooleanType, TextType),
-      next = Gen.const(AValue)
+      next = Gen.const(AValue),
+      generateProperties = false
     )
 
   def optional(alg: CoalgebraM[Gen, SchemaF, Seed]): CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM { seed =>
-    alg(seed).flatMap(schema => Gen.oneOf(schema, schema.withAttributes(Optional.enable)))
+    alg(seed).flatMap(schema => Gen.oneOf(schema, schema.withProperties(Optional.enable)))
   }
 
   def define(coalg: CoalgebraM[Gen, SchemaF, Seed] = default.coalgebra): Seed => Gen[Schema] = {

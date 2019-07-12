@@ -1,23 +1,23 @@
 package datum.ujsonlib.schemas
 
-import datum.ujsonlib.attributes.AttributeReadWriter
-import datum.patterns.attributes.Attribute
+import datum.patterns.properties._
 import datum.patterns.schemas._
+import datum.ujsonlib.properties.PropertyReadWriter
 import higherkindness.droste.{Algebra, Coalgebra, scheme}
 import upickle.default._
 
 import scala.collection.immutable.SortedMap
 
-trait SchemaReadWriter { self: AttributeReadWriter =>
+trait SchemaReadWriter { self: PropertyReadWriter =>
 
   val algebra: Algebra[SchemaF, ujson.Value] = Algebra {
-    case ObjF(fields, attributes) =>
+    case ObjF(fields, properties) =>
       ujson.Obj(
         "fields" -> fields,
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
 
-    case RowF(columns, attributes) =>
+    case RowF(columns, properties) =>
       ujson.Obj(
         "columns" ->
           columns.map(
@@ -28,67 +28,64 @@ trait SchemaReadWriter { self: AttributeReadWriter =>
                 ujson.Obj("schema" -> col.value)
             }
           ),
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
 
-    case ArrayF(element, attributes) =>
+    case ArrayF(element, properties) =>
       ujson.Obj(
         "array" -> element,
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
 
-    case NamedUnionF(alternatives, attributes) =>
+    case NamedUnionF(alternatives, properties) =>
       ujson.Obj(
         "union" -> alternatives,
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
 
-    case IndexedUnionF(alternatives, attributes) =>
+    case IndexedUnionF(alternatives, properties) =>
       ujson.Obj(
         "indexed" -> alternatives,
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
 
-    case ValueF(tpe, attributes) =>
+    case ValueF(tpe, properties) =>
       ujson.Obj(
         "type" -> Type.asString(tpe),
-        "attributes" -> writeJs(attributes)
+        "properties" -> writeJs(properties)
       )
   }
 
   val coalgebra: Coalgebra[SchemaF, ujson.Value] = Coalgebra[SchemaF, ujson.Value] {
     case ujson.Obj(fields) if fields.contains("type") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
-      ValueF(Type.fromString(fields("type").str).get, attrs)
+      val props = read[Map[String, Property]](fields("properties"))
+      ValueF(Type.fromString(fields("type").str).get, props)
 
     case ujson.Obj(fields) if fields.contains("columns") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
+      val props = read[Map[String, Property]](fields("properties"))
       val elements = fields("columns").arr.view.map { colJs =>
         val header = colJs.obj.get("header").map(_.str)
         Column[ujson.Value](colJs("schema"), header)
       }.toVector
-      RowF(elements, attrs)
+      RowF(elements, props)
 
     case ujson.Obj(fields) if fields.contains("array") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
-      ArrayF(fields("array"), attrs)
+      val props = read[Map[String, Property]](fields("properties"))
+      ArrayF(fields("array"), props)
 
     case ujson.Obj(fields) if fields.contains("fields") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
-      ObjF(SortedMap(fields("fields").obj.toSeq: _*), attrs)
+      val props = read[Map[String, Property]](fields("properties"))
+      ObjF(SortedMap(fields("fields").obj.toSeq: _*), props)
 
     case ujson.Obj(fields) if fields.contains("union") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
-      NamedUnionF(SortedMap(fields("union").obj.toSeq: _*), attrs)
+      val props = read[Map[String, Property]](fields("properties"))
+      NamedUnionF(SortedMap(fields("union").obj.toSeq: _*), props)
 
     case ujson.Obj(fields) if fields.contains("indexed") =>
-      val attrs = read[Map[String, Attribute]](fields("attributes"))
-      IndexedUnionF(fields("indexed").arr.to[Vector], attrs)
+      val props = read[Map[String, Property]](fields("properties"))
+      IndexedUnionF(fields("indexed").arr.to[Vector], props)
 
-    case fuuu =>
-      println("============ FUUUUUUU =========")
-      pprint.pprintln(fuuu)
-      ???
+    case invalid => throw SchemaReadWriter.InvalidSchemaJson(invalid)
   }
 
   implicit val scheamReadWrite: ReadWriter[Schema] = upickle.default
@@ -100,4 +97,8 @@ trait SchemaReadWriter { self: AttributeReadWriter =>
       val fromJsFn = scheme.ana(coalgebra)
       fromJsFn(js)
     })
+}
+
+object SchemaReadWriter {
+  case class InvalidSchemaJson(invalid: ujson.Value) extends Exception(s"Could not convert json to schema: $invalid")
 }

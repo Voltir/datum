@@ -1,65 +1,65 @@
 package datum.patterns.schemas
 
-import datum.patterns.attributes.{Attribute, AttributeMap}
 import cats.{Applicative, Traverse}
 import cats.instances.sortedMap._
 import cats.instances.string._
 import cats.instances.vector._
+import datum.patterns.properties.Property
 import higherkindness.droste.util.DefaultTraverse
 
 import scala.collection.immutable.SortedMap
 
 sealed trait SchemaF[+R] extends Product with Serializable {
-  def attributes: AttributeMap
-  def withAttributes(attribute: (String, Attribute)*): SchemaF[R]
+  def properties: PropertyMap
+  def withProperties(Property: (String, Property)*): SchemaF[R]
 }
 
 final case class ObjF[R](
   fields: SortedMap[String, R],
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[R] =
-    ObjF(fields, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[R] =
+    ObjF(fields, properties ++ additional)
 }
 
 final case class RowF[R](
   elements: Vector[Column[R]],
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[R] =
-    RowF(elements, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[R] =
+    RowF(elements, properties ++ additional)
 }
 
 final case class ArrayF[R](
   conforms: R,
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[R] =
-    ArrayF(conforms, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[R] =
+    ArrayF(conforms, properties ++ additional)
 }
 
 final case class NamedUnionF[R](
   alternatives: SortedMap[String, R],
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[R] =
-    NamedUnionF(alternatives, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[R] =
+    NamedUnionF(alternatives, properties ++ additional)
 }
 
 final case class IndexedUnionF[R](
   alternatives: Vector[R],
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[R] =
-    IndexedUnionF(alternatives, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[R] =
+    IndexedUnionF(alternatives, properties ++ additional)
 }
 
 final case class ValueF(
   tpe: Type,
-  attributes: AttributeMap = Map.empty
+  properties: PropertyMap = Map.empty
 ) extends SchemaF[Nothing] {
-  override def withAttributes(additional: (String, Attribute)*): SchemaF[Nothing] =
-    ValueF(tpe, attributes ++ additional)
+  override def withProperties(additional: (String, Property)*): SchemaF[Nothing] =
+    ValueF(tpe, properties ++ additional)
 }
 
 object SchemaF {

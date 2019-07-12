@@ -5,7 +5,7 @@ import datum.gen.algebras.SchemaGen
 import datum.gen.algebras.SchemaGen._
 import datum.modifiers.Optional
 import datum.patterns.{data, schemas}
-import datum.patterns.attributes._
+import datum.patterns.properties._
 import datum.patterns.schemas.{BooleanType, IntType, Schema, SchemaF}
 import higherkindness.droste.data.Fix
 import org.scalacheck.{Arbitrary, Gen}
@@ -15,7 +15,7 @@ import org.scalatestplus.scalacheck.Checkers
 
 class SchemaGenSpec extends WordSpec with Checkers with Matchers {
 
-  val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
+  private val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
 
   val ASeed: Gen[Seed] = Gen.oneOf(AnObj, AnArray, ARow, AUnion, AnIndexedUnion).map { Seed(_, 5) }
 
@@ -29,7 +29,7 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
         forAll { schema: Schema =>
           val testFn = correspondsTo(schema)
           // todo: change back to schema.project.attributes if ambiguous implicit issue gets resolved
-          val isOpt = Fix.un[SchemaF](schema).attributes.contains(Optional.key)
+          val isOpt = Fix.un[SchemaF](schema).properties.get(Optional.key).contains(true.prop)
           testFn(data.empty) == isOpt
         }
       }
@@ -38,9 +38,9 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
     "support optional union types" in {
       val requiredUnion = schemas.indexed()(schemas.value(IntType), schemas.value(BooleanType))
       val optUnion1 =
-        schemas.indexed(Optional.key -> property(true))(schemas.value(IntType), schemas.value(BooleanType))
+        schemas.indexed(Optional.key -> true.prop)(schemas.value(IntType), schemas.value(BooleanType))
       val optUnion2 =
-        schemas.indexed()(schemas.value(IntType, Optional.key -> property(true)), schemas.value(BooleanType))
+        schemas.indexed()(schemas.value(IntType, Optional.key -> true.prop), schemas.value(BooleanType))
       correspondsTo(requiredUnion)(data.empty) shouldBe false
       correspondsTo(optUnion1)(data.empty) shouldBe true
       correspondsTo(optUnion2)(data.indexed(0, data.empty)) shouldBe true
