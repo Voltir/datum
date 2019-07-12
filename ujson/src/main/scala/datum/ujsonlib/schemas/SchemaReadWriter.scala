@@ -85,10 +85,7 @@ trait SchemaReadWriter { self: PropertyReadWriter =>
       val props = read[Map[String, Property]](fields("properties"))
       IndexedUnionF(fields("indexed").arr.to[Vector], props)
 
-    case fuuu =>
-      println("============ FUUUUUUU =========")
-      pprint.pprintln(fuuu)
-      ???
+    case invalid => throw SchemaReadWriter.InvalidSchemaJson(invalid)
   }
 
   implicit val scheamReadWrite: ReadWriter[Schema] = upickle.default
@@ -100,4 +97,8 @@ trait SchemaReadWriter { self: PropertyReadWriter =>
       val fromJsFn = scheme.ana(coalgebra)
       fromJsFn(js)
     })
+}
+
+object SchemaReadWriter {
+  case class InvalidSchemaJson(invalid: ujson.Value) extends Exception(s"Could not convert json to schema: $invalid")
 }
