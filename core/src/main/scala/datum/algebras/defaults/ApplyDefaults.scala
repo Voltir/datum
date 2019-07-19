@@ -11,12 +11,9 @@ object ApplyDefaults {
   val algebra: Algebra[AttrF[SchemaF, Data, ?], Data => Data] =
     Algebra[AttrF[SchemaF, Data, ?], Data => Data] {
       // handle cases for `ObjF`s that can either themselves be missing, or contain missing fields
-      case AttrF(default, ObjF(schemaFields, attributes)) =>
+      case AttrF(_, ObjF(schemaFields, _)) =>
         inp =>
           Fix.un[DataF](inp) match {
-
-            // Handle case for when the obj itself is missing and has a default defined
-            case data.EmptyValue if attributes.contains(key) => default
 
             // Handle case for when the obj is missing, but might have default fields
             case data.EmptyValue =>
@@ -40,11 +37,9 @@ object ApplyDefaults {
           }
 
       // handle cases for `RowF`s that can either themselves be missing, or contain missing fields
-      case AttrF(default, RowF(elements, attributes)) =>
+      case AttrF(_, RowF(elements, _)) =>
         inp =>
           Fix.un[DataF](inp) match {
-            case data.EmptyValue if attributes.contains(key) => default
-
             case data.RowValue(dataValues) if dataValues.length == elements.length =>
               val updated = (dataValues zip elements) map {
                 case (inpColumn, schemaColumn) =>

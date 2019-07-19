@@ -75,6 +75,7 @@ class CompileDefaults[M[_]](rules: PropertyToDefaultRules[M])(implicit M: MonadE
       case v @ ValueF(_, _) => using(empty, v)
 
       case ObjF(fields, attrs) =>
+        // Enrich ErrorFound errors with path information (unfortunately have to do a lot of unwrapping)
         val adapted = SortedMap.newBuilder[String, M[Attr[SchemaF, Data]]]
         adapted ++= fields.map {
           case (k, v) =>
@@ -82,12 +83,16 @@ class CompileDefaults[M[_]](rules: PropertyToDefaultRules[M])(implicit M: MonadE
               case ef @ ErrorFound(_) => ef.updatePath(k)
             }
         }
+
+        // Then traverse all the MonadErrors to make sure the definitions are sound
         val valid = cats.Traverse[SortedMap[String, ?]].sequence(adapted.result())
+
         valid.flatMap { ok =>
           using(empty, ObjF(ok, attrs))
         }
 
       case RowF(elements, attrs) =>
+        // Enrich ErrorFound errors with path information (unfortunately have to do a lot of unwrapping)
         val adapted = elements.zipWithIndex.map {
           case (Column(value, header), idx) =>
             value.adaptError {
@@ -96,6 +101,8 @@ class CompileDefaults[M[_]](rules: PropertyToDefaultRules[M])(implicit M: MonadE
                 ef.updatePath(path)
             }
         }
+
+        // Then traverse all the MonadErrors to make sure the definitions are sound
         cats.Traverse[Vector].sequence(adapted).flatMap { ok =>
           val asColumn = elements.zip(ok).map {
             case (a, b) => a.copy(value = b)
@@ -103,59 +110,9 @@ class CompileDefaults[M[_]](rules: PropertyToDefaultRules[M])(implicit M: MonadE
           using(empty, RowF(asColumn, attrs))
         }
 
-//        elements.zipWithIndex.collectFirst {
-//          case (Column(Left(err), header), idx) =>
-//            val path = s"[${if (header.isDefined) header.get else s"$idx"}]"
-//            Left(err.updatePath(path))
-//        } getOrElse {
-//          using(empty, RowF(elements.map(x => x.copy(x.value.right.get)), attrs))
-//        }
-
       case otherwise => M.raiseError(InvalidDefaultDefinition(s"Invalid Schema: $otherwise"))
     }
   }
-
-//  private val algebra: Algebra[SchemaF, Either[ErrorFound, Attr[SchemaF, Data]]] = {
-//    def withType(tpe: Type)(result: Either[ErrorFound, Attr[SchemaF, Data]]) = {
-//      result.leftMap(x => x.updatePath(s"(${Type.asString(tpe)})"))
-//    }
-//
-//    Algebra[SchemaF, Either[ErrorFound, Attr[SchemaF, Data]]] {
-//      case v @ ValueF(IntType, attrs) if attrs.contains(key) =>
-//        withType(IntType) { using(rules.integer(attrs(key)), v) }
-//
-//      case v @ ValueF(TextType, attrs) if attrs.contains(key) =>
-//        withType(TextType) { using(rules.text(attrs(key)), v) }
-//
-//      case v @ ValueF(BooleanType, attrs) if attrs.contains(key) =>
-//        withType(BooleanType) { using(rules.boolean(attrs(key)), v) }
-//
-//      case v @ ValueF(_, _) => using(empty, v)
-//
-//      case ObjF(fields, attrs) =>
-//        fields.collectFirst {
-//          case (k, Left(err)) => Left(err.updatePath(k))
-//        } getOrElse {
-//          val valid = fields.mapValues {
-//            case Right(ok) => ok
-//            case Left(err) => throw new Exception(s"Impossible: $err")
-//          }
-//          using(empty, ObjF(valid, attrs))
-//        }
-//
-//      case RowF(elements, attrs) =>
-//        elements.zipWithIndex.collectFirst {
-//          case (Column(Left(err), header), idx) =>
-//            val path = s"[${if (header.isDefined) header.get else s"$idx"}]"
-//            Left(err.updatePath(path))
-//        } getOrElse {
-//          using(empty, RowF(elements.map(x => x.copy(x.value.right.get)), attrs))
-//        }
-//
-//      case otherwise => Left(ErrorFound(s"TODO map: $otherwise"))
-//
-//    }
-//  }
 
   private val generator = scheme.cata(algebra2)
 

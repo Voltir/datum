@@ -108,7 +108,7 @@ class DefaultsSpec extends WordSpec with Matchers {
 
       check.values should contain allOf (data.text("Bob"), data.boolean(true), data.integer(42))
     }
-
+    
     "resize columns modifier should work" in {
       val person: Schema = schemas.row(Map(defaults.modifiers.EnableColumnDefaultExpansion.enable))(
         Column(schemas.value(TextType), Some("name")),
