@@ -4,8 +4,10 @@ import datum.algebras.defaults._
 import datum.patterns.{data, schemas}
 import datum.patterns.schemas._
 import datum.patterns.properties._
-import org.scalatest.{Matchers, WordSpec}
 import datum.patterns.data.{Data, DataF, ObjValue, RowValue}
+
+import cats.instances.either._
+import org.scalatest.{Matchers, WordSpec}
 import higherkindness.droste.data.Fix
 
 class DefaultsSpec extends WordSpec with Matchers {
@@ -13,7 +15,7 @@ class DefaultsSpec extends WordSpec with Matchers {
   /* Constructs a "schema compiler" that has rules for taking
    * the schema's "default" Attributes and converting it into Data.
    */
-  val compiler = CompileDefaults()
+  val compiler = CompileDefaults(DefaultPropertyToDefaultRules.either)
 
   "The Defaults algebra" should {
     "work given a basic example" in {
