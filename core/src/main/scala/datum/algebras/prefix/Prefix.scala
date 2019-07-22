@@ -23,7 +23,7 @@ object Prefix {
         case RowF(columns, props) =>
           val next = columns.zipWithIndex.map {
             case (col, idx) =>
-              val prefixed = (prefix.append(Index(idx)), col.value)
+              val prefixed = (prefix.append(Index(idx, col.header)), col.value)
               Column(prefixed, col.header)
           }
           AttrF(prefix, RowF(next, props))
@@ -47,9 +47,11 @@ object Prefix {
       }
   }
 
+  val root: Prefix = Chain.one(Root)
+
   def apply(schema: Schema): SchemaWithPrefix = {
     val fn = scheme.ana(coalgebra)
-    val result = fn((Chain.one(Root), schema))
+    val result = fn((root, schema))
     result
   }
 

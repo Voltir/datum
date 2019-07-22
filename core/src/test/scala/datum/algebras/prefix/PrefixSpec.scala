@@ -26,7 +26,7 @@ class PrefixSpec extends WordSpec with Matchers {
 
     "PathPrefix should convert arrays to strings" in {
       val prefix = Chain(PathPart.Root, PathPart.ArrayPart, PathPart.Field("B"))
-      Prefix.toString(prefix) shouldBe "/[]/B"
+      Prefix.toString(prefix) shouldBe "/(Array)/B"
     }
 
     "PathPrefix should handle union schemas" in {
