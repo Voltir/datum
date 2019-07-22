@@ -1,5 +1,6 @@
 package datum.algebras
 
+import datum.algebras.corresponds.Corresponds
 import datum.gen.algebras.{DataGen, SchemaGen}
 import datum.gen.algebras.SchemaGen.{AnObj, Seed}
 import datum.patterns.data.Data

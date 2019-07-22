@@ -1,5 +1,5 @@
 package datum.gen
-import datum.algebras.Corresponds
+import datum.algebras.corresponds.Corresponds
 import datum.gen.algebras.DataGen
 import datum.modifiers.Optional
 import datum.patterns.data.{BytesValue, Data, DataF, ZonedTimeValue}

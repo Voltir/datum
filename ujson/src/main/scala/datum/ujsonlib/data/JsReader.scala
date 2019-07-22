@@ -1,21 +1,22 @@
 package datum.ujsonlib.data
 
-import scala.language.higherKinds
-import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
-import java.util.Base64
-
-import cats.{MonadError, Traverse}
 import datum.patterns.data._
 import datum.patterns.{schemas, data => d}
 import datum.patterns.schemas._
+import datum.patterns.properties._
+
+import datum.modifiers.Optional
 import higherkindness.droste.{Algebra, scheme}
+import cats.{MonadError, Traverse}
 import cats.syntax.functor._
 import cats.syntax.applicativeError._
 import cats.instances.vector._
 import cats.data.Chain
-import datum.modifiers.Optional
 
 import scala.collection.immutable.SortedMap
+import scala.language.higherKinds
+import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
+import java.util.Base64
 
 class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
   import JsReader._
@@ -130,7 +131,7 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
   def optional(alg: Algebra[SchemaF, ujson.Value => M[Data]]): Algebra[SchemaF, ujson.Value => M[Data]] =
     Algebra { schema => js =>
       val fn = alg(schema)
-      val isOpt = schema.properties.get(Optional.key).contains(true)
+      val isOpt = schema.properties.get(Optional.key).contains(true.prop)
       (isOpt, js.isNull) match {
         case (true, true)  => M.pure(d.empty)
         case (true, false) => fn(js).recover { case _ => d.empty }

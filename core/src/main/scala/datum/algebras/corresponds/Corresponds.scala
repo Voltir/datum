@@ -1,9 +1,9 @@
-package datum.algebras
+package datum.algebras.corresponds
 import datum.modifiers.Optional
 import datum.patterns.data
 import datum.patterns.data._
-import datum.patterns.properties._
 import datum.patterns.schemas._
+import datum.patterns.properties._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.{Algebra, scheme}
 

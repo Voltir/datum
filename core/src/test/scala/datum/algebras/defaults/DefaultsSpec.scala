@@ -1,14 +1,13 @@
-package datum.algebras
-
-import datum.algebras.defaults._
-import datum.patterns.{data, schemas}
-import datum.patterns.schemas._
-import datum.patterns.properties._
-import datum.patterns.data.{Data, DataF, ObjValue, RowValue}
+package datum.algebras.defaults
 
 import cats.instances.either._
-import org.scalatest.{Matchers, WordSpec}
+import datum.algebras.defaults
+import datum.patterns.data.{Data, DataF, ObjValue, RowValue}
+import datum.patterns.properties._
+import datum.patterns.schemas._
+import datum.patterns.{data, schemas}
 import higherkindness.droste.data.Fix
+import org.scalatest.{Matchers, WordSpec}
 
 class DefaultsSpec extends WordSpec with Matchers {
 

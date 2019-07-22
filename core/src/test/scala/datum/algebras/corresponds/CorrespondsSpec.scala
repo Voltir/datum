@@ -1,8 +1,8 @@
-package datum.algebras
+package datum.algebras.corresponds
 
 import datum.modifiers.Optional
-import datum.patterns.schemas.{IntType, Schema, TextType}
 import datum.patterns.data.Data
+import datum.patterns.schemas.{IntType, Schema, TextType}
 import datum.patterns.{data, schemas}
 import org.scalatest.{Matchers, WordSpec}
 

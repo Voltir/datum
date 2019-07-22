@@ -1,6 +1,5 @@
 package datum.gen
-
-import datum.algebras.Corresponds
+import datum.algebras.corresponds.Corresponds
 import datum.gen.algebras.SchemaGen
 import datum.gen.algebras.SchemaGen._
 import datum.modifiers.Optional
