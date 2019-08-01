@@ -82,7 +82,7 @@ object WriteJs {
         case _                     => ujson.Null
       }
 
-    case NamedUnionF(alts, _) =>
+    case UnionF(alts, _) =>
       Fix.un[DataF](_) match {
         case data.NamedUnionValue(selection, value) =>
           alts
@@ -95,13 +95,6 @@ object WriteJs {
             .getOrElse(ujson.Null)
         case _ =>
           ujson.Null
-      }
-
-    case IndexedUnionF(alts, _) =>
-      Fix.un[DataF](_) match {
-        case data.IndexedUnionValue(idx, v) if idx >= 0 && idx < alts.length =>
-          val fn = alts(idx)
-          ujson.Arr(ujson.Num(idx), fn(v))
       }
 
     case _ =>

@@ -104,27 +104,13 @@ class JsReader[M[_]]()(implicit M: MonadError[M, Throwable]) {
         M.raiseError(SchemaMismatchException("Invalid Array"))
     }
 
-    case NamedUnionF(alts, _) => {
+    case UnionF(alts, _) => {
       case ujson.Obj(fields) =>
         val selection = fields.keySet.head
         alts(selection)(fields(selection)).map { res =>
           d.union(selection, res)
         }
       case _ => M.raiseError(SchemaMismatchException("Invalid Union Value"))
-    }
-
-    case IndexedUnionF(alts, _) => {
-      case ujson.Arr(values) if values.length == 2 =>
-        try {
-          val idx = values(0).num.toInt
-          val fn = alts(idx)
-          fn(values(1)).map { res =>
-            d.indexed(idx, res)
-          }
-        } catch {
-          case e: Exception => M.raiseError(e)
-        }
-      case _ => M.raiseError(SchemaMismatchException("Invalid IndexedUnion Value"))
     }
   }
 

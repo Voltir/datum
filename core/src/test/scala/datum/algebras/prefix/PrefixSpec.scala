@@ -37,7 +37,7 @@ class PrefixSpec extends WordSpec with Matchers {
 
       // collects a list of terminal prefixes
       val collect: AlgebraM[List, SchemaWithPrefixF, String] = AlgebraM[List, SchemaWithPrefixF, String] {
-        case AttrF(_, NamedUnionF(alts, _)) => alts.values.toList
+        case AttrF(_, UnionF(alts, _)) => alts.values.toList
         case AttrF(_, ObjF(fields, _))      => fields.values.toList
         case AttrF(p, _)                    => Prefix.toString(p) :: Nil
       }

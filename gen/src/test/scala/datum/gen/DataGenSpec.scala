@@ -6,7 +6,6 @@ import datum.patterns.data.{BytesValue, Data, DataF, ZonedTimeValue}
 import datum.patterns.{data, schemas}
 import datum.patterns.schemas._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.project._
 import org.scalacheck.Arbitrary
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._

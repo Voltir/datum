@@ -37,15 +37,9 @@ trait SchemaReadWriter { self: PropertyReadWriter =>
         "properties" -> writeJs(properties)
       )
 
-    case NamedUnionF(alternatives, properties) =>
+    case UnionF(alternatives, properties) =>
       ujson.Obj(
         "union" -> alternatives,
-        "properties" -> writeJs(properties)
-      )
-
-    case IndexedUnionF(alternatives, properties) =>
-      ujson.Obj(
-        "indexed" -> alternatives,
         "properties" -> writeJs(properties)
       )
 
@@ -79,11 +73,7 @@ trait SchemaReadWriter { self: PropertyReadWriter =>
 
     case ujson.Obj(fields) if fields.contains("union") =>
       val props = read[Map[String, Property]](fields("properties"))
-      NamedUnionF(SortedMap(fields("union").obj.toSeq: _*), props)
-
-    case ujson.Obj(fields) if fields.contains("indexed") =>
-      val props = read[Map[String, Property]](fields("properties"))
-      IndexedUnionF(fields("indexed").arr.to[Vector], props)
+      UnionF(SortedMap(fields("union").obj.toSeq: _*), props)
 
     case invalid => throw SchemaReadWriter.InvalidSchemaJson(invalid)
   }

@@ -32,18 +32,11 @@ object Prefix {
           val next = (prefix.append(ArrayPart), conforms)
           AttrF.apply(prefix, ArrayF(next, props))
 
-        case NamedUnionF(alts, props) =>
+        case UnionF(alts, props) =>
           val next = prefixMap(alts) { k =>
             prefix.append(NamedSelection(k))
           }
-          AttrF(prefix, NamedUnionF(next, props))
-
-        case IndexedUnionF(alts, props) =>
-          val next = alts.zipWithIndex.map {
-            case (s, idx) =>
-              (prefix.append(IndexedSelection(idx)), s)
-          }
-          AttrF(prefix, IndexedUnionF(next, props))
+          AttrF(prefix, UnionF(next, props))
       }
   }
 

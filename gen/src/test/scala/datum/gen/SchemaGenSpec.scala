@@ -16,7 +16,7 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
 
   private val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
 
-  val ASeed: Gen[Seed] = Gen.oneOf(AnObj, AnArray, ARow, AUnion, AnIndexedUnion).map { Seed(_, 5) }
+  val ASeed: Gen[Seed] = Gen.oneOf(AnObj, AnArray, ARow, AUnion).map { Seed(_, 5) }
 
   "Schema Generation" should {
     "support optional values" in {
@@ -35,17 +35,17 @@ class SchemaGenSpec extends WordSpec with Checkers with Matchers {
     }
 
     "support optional union types" in {
-      val requiredUnion = schemas.indexed()(schemas.value(IntType), schemas.value(BooleanType))
+      val requiredUnion = schemas.union()("a" -> schemas.value(IntType), "b" -> schemas.value(BooleanType))
       val optUnion1 =
-        schemas.indexed(Optional.key -> true.prop)(schemas.value(IntType), schemas.value(BooleanType))
+        schemas.union(Optional.key -> true.prop)("a" -> schemas.value(IntType), "b" -> schemas.value(BooleanType))
       val optUnion2 =
-        schemas.indexed()(schemas.value(IntType, Optional.key -> true.prop), schemas.value(BooleanType))
+        schemas.union()("a" -> schemas.value(IntType, Optional.key -> true.prop), "b" -> schemas.value(BooleanType))
       correspondsTo(requiredUnion)(data.empty) shouldBe false
       correspondsTo(optUnion1)(data.empty) shouldBe true
-      correspondsTo(optUnion2)(data.indexed(0, data.empty)) shouldBe true
+      correspondsTo(optUnion2)(data.union("a", data.empty)) shouldBe true
     }
 
-    "unique colmns are unique" in {
+    "unique columns are unique" in {
       val unique = new SchemaGen(uniqueColumnNames = true, maxFields = 30)
       val fn = SchemaGen.define(unique.coalgebra)
 

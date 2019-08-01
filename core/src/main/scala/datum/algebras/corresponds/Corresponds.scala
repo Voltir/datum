@@ -38,19 +38,13 @@ object Corresponds {
         case _ => false
       }
 
-    case NamedUnionF(alternatives, _) =>
+    case UnionF(alternatives, _) =>
       Fix.un[DataF](_) match {
         case NamedUnionValue(selected, v) =>
           alternatives.get(selected).exists(_.apply(v))
         case _ => false
       }
 
-    case IndexedUnionF(alternatives, _) =>
-      Fix.un[DataF](_) match {
-        case IndexedUnionValue(idx, v) if idx >= 0 && idx < alternatives.length =>
-          alternatives(idx)(v)
-        case _ => false
-      }
 
     case ArrayF(fn, _) =>
       Fix.un[DataF](_) match {

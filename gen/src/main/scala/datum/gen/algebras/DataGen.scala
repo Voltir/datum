@@ -82,17 +82,11 @@ object DataGen {
     case ArrayF(element, _) =>
       Gen.resize(5, Gen.containerOf[Vector, Data](element).map(data.row))
 
-    case NamedUnionF(alternatives, _) =>
+    case UnionF(alternatives, _) =>
       for {
         name <- Gen.oneOf(alternatives.keySet.toSeq)
         v <- alternatives(name)
       } yield data.union(name, v)
-
-    case IndexedUnionF(alternatives, _) =>
-      for {
-        idx <- Gen.chooseNum(0, alternatives.length - 1)
-        v <- alternatives(idx)
-      } yield data.indexed(idx, v)
 
     case other =>
       Traverse[SchemaF].sequence(other).flatMap(helpers(_))

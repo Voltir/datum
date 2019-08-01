@@ -88,15 +88,6 @@ class SchemaGen(
     }
   }
 
-  private def genIndexed(level: Int): Gen[SchemaF[Seed]] = {
-    Gen.resize(
-      3,
-      Gen.nonEmptyContainerOf[Vector, Seed](nest(level)).map { alts =>
-        IndexedUnionF[Seed](alts)
-      }
-    )
-  }
-
   private def genUnion(level: Int): Gen[SchemaF[Seed]] = {
     val alts = for {
       k <- Gen.resize(5, Gen.alphaLowerStr)
@@ -104,7 +95,7 @@ class SchemaGen(
     } yield (k, s)
 
     Gen.resize(maxFields, Gen.nonEmptyListOf(alts)).map { choices =>
-      NamedUnionF[Seed](SortedMap(choices: _*))
+      UnionF[Seed](SortedMap(choices: _*))
     }
   }
 
@@ -119,7 +110,6 @@ class SchemaGen(
     case Seed(AnObj, level)          => addProperties(genObj(level))
     case Seed(ARow, level)           => addProperties(genRow(level))
     case Seed(AUnion, level)         => addProperties(genUnion(level))
-    case Seed(AnIndexedUnion, level) => addProperties(genIndexed(level))
     case Seed(AnArray, level)        => addProperties(genArray(level))
   }
 }
@@ -150,7 +140,6 @@ object SchemaGen {
       1 -> Gen.const(AnObj),
       1 -> Gen.const(ARow),
       1 -> Gen.const(AUnion),
-      1 -> Gen.const(AnIndexedUnion),
       1 -> Gen.const(AnArray)
     )
   }
@@ -160,7 +149,6 @@ object SchemaGen {
   final case object AnObj extends Next
   final case object ARow extends Next
   final case object AUnion extends Next
-  final case object AnIndexedUnion extends Next
   final case object AnArray extends Next
 
   case class Seed(next: Next, level: Int)

@@ -38,20 +38,12 @@ final case class ArrayF[R](
     ArrayF(conforms, properties ++ additional)
 }
 
-final case class NamedUnionF[R](
+final case class UnionF[R](
   alternatives: SortedMap[String, R],
   properties: PropertyMap = Map.empty
 ) extends SchemaF[R] {
   override def withProperties(additional: (String, Property)*): SchemaF[R] =
-    NamedUnionF(alternatives, properties ++ additional)
-}
-
-final case class IndexedUnionF[R](
-  alternatives: Vector[R],
-  properties: PropertyMap = Map.empty
-) extends SchemaF[R] {
-  override def withProperties(additional: (String, Property)*): SchemaF[R] =
-    IndexedUnionF(alternatives, properties ++ additional)
+    UnionF(alternatives, properties ++ additional)
 }
 
 final case class ValueF(
@@ -78,13 +70,9 @@ object SchemaF {
           val tm = Traverse[SortedMap[String, ?]].traverse(fields)(f)
           G.map(tm)(x => ObjF(x, attrs))
 
-        case NamedUnionF(alts, attrs) =>
+        case UnionF(alts, attrs) =>
           val tm = Traverse[SortedMap[String, ?]].traverse(alts)(f)
-          G.map(tm)(x => NamedUnionF(x, attrs))
-
-        case IndexedUnionF(alts, attrs) =>
-          val tv = Traverse[Vector].traverse(alts)(f)
-          G.map(tv)(x => IndexedUnionF(x, attrs))
+          G.map(tm)(x => UnionF(x, attrs))
 
         case ArrayF(e, meta) => G.map(f(e))(x => ArrayF(x, meta))
       }

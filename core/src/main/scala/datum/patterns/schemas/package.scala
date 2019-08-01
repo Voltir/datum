@@ -32,19 +32,11 @@ package object schemas {
   }
 
   def union(properties: PropertyMap = Map.empty)(alternatives: (String, Schema)*): Schema = {
-    Fix(NamedUnionF(SortedMap(alternatives: _*), properties))
+    Fix(UnionF(SortedMap(alternatives: _*), properties))
   }
 
   def union(properties: (String, Property)*)(alternatives: (String, Schema)*): Schema = {
-    Fix(NamedUnionF(SortedMap(alternatives: _*), Map(properties: _*)))
-  }
-
-  def indexed(properties: PropertyMap = Map.empty)(alternatives: Schema*): Schema = {
-    Fix(IndexedUnionF(Vector(alternatives: _*), properties))
-  }
-
-  def indexed(properties: (String, Property)*)(alternatives: Schema*): Schema = {
-    Fix(IndexedUnionF(Vector(alternatives: _*), Map(properties: _*)))
+    Fix(UnionF(SortedMap(alternatives: _*), Map(properties: _*)))
   }
 
   def array(properties: PropertyMap = Map.empty)(conforms: Schema): Schema = {
