@@ -1,5 +1,8 @@
 package datum.ujsonlib
-import datum.ujsonlib.properties.PropertyReadWriter
+import datum.patterns.schemas.Schema
 import datum.ujsonlib.schemas.SchemaReadWriter
 
-package object implicits extends SchemaReadWriter with PropertyReadWriter
+package object implicits {
+  import upickle.default._
+  implicit val schemaRW: ReadWriter[Schema] = SchemaReadWriter(upickle.default)
+}

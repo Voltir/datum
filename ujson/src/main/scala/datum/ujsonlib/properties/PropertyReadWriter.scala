@@ -2,7 +2,6 @@ package datum.ujsonlib.properties
 
 import datum.patterns.properties._
 import higherkindness.droste._
-import upickle.default._
 
 import scala.collection.immutable.SortedMap
 
@@ -27,21 +26,19 @@ object PropertyReadWriter {
       builder ++= fields.iterator
       CollectionPropF(builder.result())
   }
-}
 
-trait PropertyReadWriter {
-  import PropertyReadWriter._
-
-  implicit val attrReadWrite: ReadWriter[Property] = upickle.default
-    .readwriter[ujson.Value]
-    .bimap[Property](
-      attr => {
-        val toJsonFn = scheme.cata(algebra)
-        toJsonFn(attr)
-      },
-      js => {
-        val fromJsonFn = scheme.ana(coalgebra)
-        fromJsonFn(js)
-      }
-    )
+  def propertyRW(implicit api: upickle.Api): api.ReadWriter[Property] = {
+    api
+      .readwriter[ujson.Value](api.ReadWriter.join(api.JsValueR, api.JsValueW))
+      .bimap[Property](
+        attr => {
+          val toJsonFn = scheme.cata(algebra)
+          toJsonFn(attr)
+        },
+        js => {
+          val fromJsonFn = scheme.ana(coalgebra)
+          fromJsonFn(js)
+        }
+      )
+  }
 }
