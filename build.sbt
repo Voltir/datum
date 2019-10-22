@@ -2,14 +2,14 @@
 val catsV = "1.6.0"
 val drosteV = "0.7.0"
 
-lazy val scala212 = "2.12.8"
-lazy val scala211 = "2.11.12"
+lazy val scala212 = "2.12.10"
+
 lazy val supportedScalaVersions = List(scala212)
 
 // Settings
 lazy val commonSettings = Seq(
   name := "datum",
-  version := "0.4.0", //not published yet
+  version := "0.4.2-SNAPSHOT",
   crossScalaVersions := supportedScalaVersions,
   organization := "io.github.voltir",
   resolvers += Resolver.sonatypeRepo("releases"),
@@ -44,6 +44,8 @@ lazy val commonSettings = Seq(
 lazy val datum = (project in file("."))
   .settings(
     skip in publish := true,
+    // must be set to nil to avoid double publishing
+    crossScalaVersions := Nil,
     sonatypeProfileName := "io.github.voltir"
   )
   .aggregate(core, gen, testCore, ujson, avro)
@@ -60,7 +62,7 @@ lazy val gen = (project in file("gen"))
   .settings(
     name := "datum-gen",
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.7",
+      "org.scalatest" %% "scalatest" % "3.0.8",
       "io.chrisdavenport" %% "cats-scalacheck" % "0.1.1"
     )
   )
@@ -94,7 +96,7 @@ lazy val ujson = (project in file("ujson"))
   .settings(
     name := "datum-ujson",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.7.5"
+      "com.lihaoyi" %% "upickle" % "0.8.0"
     )
   )
   .settings(sonatypePublish)

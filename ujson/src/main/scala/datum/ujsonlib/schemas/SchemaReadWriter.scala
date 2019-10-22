@@ -25,9 +25,9 @@ class SchemaReadWriter[API <: upickle.Api](implicit val api: API) {
           columns.map(
             col =>
               col.header.map { hdr =>
-                ujson.Obj("schema" -> col.value, "header" -> hdr)
+                ujson.Obj("column" -> col.value, "header" -> hdr)
               } getOrElse {
-                ujson.Obj("schema" -> col.value)
+                ujson.Obj("column" -> col.value)
             }
           ),
         "properties" -> api.writeJs(properties)
@@ -61,7 +61,7 @@ class SchemaReadWriter[API <: upickle.Api](implicit val api: API) {
       val props = api.read[Map[String, Property]](fields("properties"))
       val elements = fields("columns").arr.view.map { colJs =>
         val header = colJs.obj.get("header").map(_.str)
-        Column[ujson.Value](colJs("schema"), header)
+        Column[ujson.Value](colJs("column"), header)
       }.toVector
       RowF(elements, props)
 
