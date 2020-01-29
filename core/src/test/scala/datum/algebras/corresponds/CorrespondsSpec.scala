@@ -4,9 +4,10 @@ import datum.modifiers.Optional
 import datum.patterns.data.Data
 import datum.patterns.schemas.{IntType, Schema, TextType}
 import datum.patterns.{data, schemas}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CorrespondsSpec extends WordSpec with Matchers {
+class CorrespondsSpec extends AnyWordSpec with Matchers {
 
   val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
 

@@ -9,14 +9,14 @@ import datum.patterns.{schemas => s}
 import datum.modifiers.Optional
 import datum.ujsonlib.data.{JsReader, WriteJs}
 import datum.ujsonlib.implicits._
-
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
 import org.scalatestplus.scalacheck.Checkers
 import cats.instances.all._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class UjsonLibSpec extends WordSpec with Checkers with Matchers {
+class UjsonLibSpec extends AnyWordSpec with Checkers with Matchers {
 
   private val aSeed = Gen.oneOf(SchemaGen.AnObj, SchemaGen.ARow, SchemaGen.AUnion).map(Seed(_, 5))
 

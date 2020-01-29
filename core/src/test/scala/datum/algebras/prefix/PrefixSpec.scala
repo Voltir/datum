@@ -6,11 +6,12 @@ import datum.patterns.schemas._
 import higherkindness.droste.{AlgebraM, scheme}
 import higherkindness.droste.data.{Attr, AttrF}
 import higherkindness.droste.data.prelude._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.SortedMap
 
-class PrefixSpec extends WordSpec with Matchers {
+class PrefixSpec extends AnyWordSpec with Matchers {
 
   "The Prefix function" should {
     "work in a simple case" in {

@@ -1,6 +1,7 @@
 // Versions
-val catsV = "1.6.0"
-val drosteV = "0.7.0"
+val catsV = "2.0.0"
+val drosteV = "0.8.0"
+val scalaTestV = "3.1.0"
 
 lazy val scala212 = "2.12.10"
 
@@ -9,11 +10,12 @@ lazy val supportedScalaVersions = List(scala212)
 // Settings
 lazy val commonSettings = Seq(
   name := "datum",
-  version := "0.4.2-SNAPSHOT",
+  version := "0.5.1-SNAPSHOT", //not published
+  scalaVersion := scala212,
   crossScalaVersions := supportedScalaVersions,
   organization := "io.github.voltir",
   resolvers += Resolver.sonatypeRepo("releases"),
-  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7"),
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full),
   scalacOptions ++= Seq(
     "-Xlint",
     "-deprecation",
@@ -31,12 +33,14 @@ lazy val commonSettings = Seq(
     "-Ywarn-unused:privates" // Warn if a private member is unused.
     //"-Xfatal-warnings"
   ),
+  fork in Test := true,
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsV,
     "org.typelevel" %% "alleycats-core" % catsV,
     "io.higherkindness" %% "droste-core" % drosteV,
-    "com.lihaoyi" %% "pprint" % "0.5.3",
-    "org.scalatest" %% "scalatest" % "3.0.7" % Test
+    "com.lihaoyi" %% "pprint" % "0.5.3" % Test,
+    "org.scalatest" %% "scalatest" % scalaTestV % Test,
+    "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test
   )
 )
 
@@ -62,8 +66,8 @@ lazy val gen = (project in file("gen"))
   .settings(
     name := "datum-gen",
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.8",
-      "io.chrisdavenport" %% "cats-scalacheck" % "0.1.1"
+      "org.scalatest" %% "scalatest" % scalaTestV,
+      "io.chrisdavenport" %% "cats-scalacheck" % "0.2.0",
     )
   )
   .settings(sonatypePublish)
@@ -96,7 +100,7 @@ lazy val ujson = (project in file("ujson"))
   .settings(
     name := "datum-ujson",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.8.0"
+      "com.lihaoyi" %% "upickle" % "0.9.5"
     )
   )
   .settings(sonatypePublish)
