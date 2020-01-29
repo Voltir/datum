@@ -6,10 +6,11 @@ import datum.patterns.schemas
 import org.apache.avro.{SchemaBuilder, Schema => AvroSchema}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.Checkers
 
-class AvroSchemaReaderSpec extends WordSpec with Checkers with Matchers {
+class AvroSchemaReaderSpec extends AnyWordSpec with Checkers with Matchers {
 
   "AvroSchemaReader" should {
 

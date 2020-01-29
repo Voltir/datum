@@ -8,11 +8,13 @@ import datum.patterns.schemas._
 import higherkindness.droste.{Algebra, scheme}
 import higherkindness.droste.data.Fix
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.Prop.{forAll, BooleanOperators}
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalacheck.Prop.{BooleanOperators, forAll}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.Checkers
 
-class RecordReaderSpec extends WordSpec with Checkers with Matchers {
+class RecordReaderSpec extends AnyWordSpec with Checkers with Matchers {
 
   // Normalize missing values to data.empty to make comparing optional values easier
   private val normalize = scheme.cata {

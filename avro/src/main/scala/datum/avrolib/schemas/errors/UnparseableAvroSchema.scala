@@ -1,3 +1,3 @@
 package datum.avrolib.schemas.errors
 
-case class UnparseableAvroSchema(msg: String) extends Exception
+case class UnparseableAvroSchema(msg: String) extends Exception(msg)

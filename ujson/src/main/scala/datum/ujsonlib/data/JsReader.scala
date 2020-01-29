@@ -138,7 +138,7 @@ object JsReader {
   sealed abstract class JsReaderException(msg: String) extends Exception(msg)
 
   case class JsTypeException(tpe: Type, js: ujson.Value)
-    extends JsReaderException(s"Expected ${schemas.Type.asString(tpe)} but got ${pprint.apply(js, 2)}")
+    extends JsReaderException(s"Expected ${schemas.Type.asString(tpe)} but got ${js.render(2, escapeUnicode = false)}")
 
   case class SchemaMismatchException(msg: String) extends JsReaderException(msg)
 

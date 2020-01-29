@@ -8,11 +8,12 @@ import datum.patterns.properties._
 import datum.patterns.schemas.{BooleanType, IntType, Schema, SchemaF}
 import higherkindness.droste.data.Fix
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.Checkers
 
-class SchemaGenSpec extends WordSpec with Checkers with Matchers {
+class SchemaGenSpec extends AnyWordSpec with Checkers with Matchers {
 
   private val correspondsTo = Corresponds.define(Corresponds.optional(Corresponds.algebra))
 

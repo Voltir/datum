@@ -7,11 +7,12 @@ import datum.patterns.{data, schemas}
 import datum.patterns.schemas._
 import higherkindness.droste.data.Fix
 import org.scalacheck.Arbitrary
-import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.Checkers
 
-class DataGenSpec extends WordSpec with Checkers with Matchers {
+class DataGenSpec extends AnyWordSpec with Checkers with Matchers {
 
   val test: Schema = schemas.obj()(
     "foo" -> schemas.value(IntType, Optional.enable),

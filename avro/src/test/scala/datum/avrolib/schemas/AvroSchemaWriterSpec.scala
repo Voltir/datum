@@ -1,15 +1,15 @@
 package datum.avrolib.schemas
 import datum.gen.algebras.SchemaGen
-import datum.modifiers.Optional
 import datum.patterns.schemas
 import datum.patterns.schemas._
 import org.apache.avro.{Schema => AvroSchema}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.Checkers
 
-class AvroSchemaWriterSpec extends WordSpec with Checkers with Matchers {
+class AvroSchemaWriterSpec extends AnyWordSpec with Checkers with Matchers {
 
   "AvroSchemaWriter" should {
     "be able to encode a simple schema" in {
@@ -20,7 +20,6 @@ class AvroSchemaWriterSpec extends WordSpec with Checkers with Matchers {
 
       val avro = AvroSchemaWriter.write(simple)
 
-      println(avro)
       assert(avro.getField("foo").schema().getType == AvroSchema.Type.INT)
       assert(avro.getField("bar").schema().getType == AvroSchema.Type.BOOLEAN)
     }

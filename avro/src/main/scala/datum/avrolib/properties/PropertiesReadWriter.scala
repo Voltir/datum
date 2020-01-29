@@ -9,6 +9,8 @@ import scala.collection.JavaConverters._
 
 object PropertiesReadWriter {
 
+  case class InvalidPropertyDefinition(msg: String) extends Exception(msg)
+
   private val objectMapper = new ObjectMapper
 
   // writer algebra
@@ -34,8 +36,7 @@ object PropertiesReadWriter {
           builder += (entry.getKey -> entry.getValue)
         }
         CollectionPropF(builder.result())
-      case otherwise => throw new Exception(s"Invalid json type for a property: $otherwise")
+      case otherwise => throw InvalidPropertyDefinition(s"Invalid json type for a property: $otherwise")
     }
   }
-
 }

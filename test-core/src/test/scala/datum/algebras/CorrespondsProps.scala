@@ -7,11 +7,11 @@ import datum.patterns.data.Data
 import datum.patterns.schemas
 import datum.patterns.schemas.{IntType, Schema, TextType}
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.WordSpec
 import org.scalacheck.Prop._
-import org.scalatest.prop.Checkers
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.scalacheck.Checkers
 
-class CorrespondsProps extends WordSpec with Checkers {
+class CorrespondsProps extends AnyWordSpec with Checkers {
 
   private val genSchema = SchemaGen.define()(Seed(AnObj, 5))
 

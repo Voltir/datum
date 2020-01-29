@@ -7,9 +7,10 @@ import datum.patterns.properties._
 import datum.patterns.schemas._
 import datum.patterns.{data, schemas}
 import higherkindness.droste.data.Fix
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DefaultsSpec extends WordSpec with Matchers {
+class DefaultsSpec extends AnyWordSpec with Matchers {
 
   /* Constructs a "schema compiler" that has rules for taking
    * the schema's "default" Attributes and converting it into Data.

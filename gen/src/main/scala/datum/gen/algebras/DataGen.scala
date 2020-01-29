@@ -26,7 +26,7 @@ object DataGen {
 
     case RowF(elements, _) => data.row(elements.map(_.value))
 
-    case err => throw new Exception(s"Impossible: ${pprint.apply(err)}")
+    case err => throw new Exception(s"Failed to generate a: $err")
   }
 
   private val unixtime = Gen.chooseNum(Integer.MAX_VALUE / 8, Integer.MAX_VALUE).map { ts =>

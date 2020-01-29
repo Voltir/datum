@@ -8,10 +8,11 @@ import datum.modifiers.Optional
 import datum.patterns.{data => d}
 import datum.patterns.schemas
 import datum.patterns.schemas._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.Checkers
 
-class RecordWriterSpec extends WordSpec with Checkers with Matchers {
+class RecordWriterSpec extends AnyWordSpec with Checkers with Matchers {
 
   val recordWriter = new RecordWriter(AvroSchemaWriter.write)
 
