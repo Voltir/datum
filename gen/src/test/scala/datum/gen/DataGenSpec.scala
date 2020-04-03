@@ -2,7 +2,7 @@ package datum.gen
 import datum.algebras.corresponds.Corresponds
 import datum.gen.algebras.DataGen
 import datum.modifiers.Optional
-import datum.patterns.data.{BytesValue, Data, DataF, ZonedDateTimeValue}
+import datum.patterns.data.{BytesValue, Data, DataF, TextValue, ZonedDateTimeValue}
 import datum.patterns.{data, schemas}
 import datum.patterns.schemas._
 import higherkindness.droste.data.Fix
@@ -85,6 +85,19 @@ class DataGenSpec extends AnyWordSpec with Checkers with Matchers {
           Fix.un[DataF](data) match {
             case BytesValue(_) => true
             case _             => false
+          }
+        }
+      }
+    }
+
+    "not generate empty strings for non-optional schemas" in {
+      val schema = schemas.value(TextType)
+      val datagen = DataGen.define(DataGen.algebra)
+      implicit val arb: Arbitrary[Data] = Arbitrary(datagen(schema))
+      check {
+        forAll { data: Data =>
+          Fix.un[DataF](data) match {
+            case TextValue(x) => !x.isEmpty
           }
         }
       }
