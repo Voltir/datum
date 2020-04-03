@@ -7,7 +7,7 @@ import datum.patterns.schemas._
 import datum.patterns.properties._
 import datum.modifiers.Optional
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.cats.implicits._
 import higherkindness.droste.{Algebra, AlgebraM, scheme}
 
@@ -42,11 +42,13 @@ object DataGen {
   private val zones = Gen.oneOf(allzones)
 
   val algebra: Algebra[SchemaF, Gen[Data]] = Algebra {
-    case ValueF(IntType, _)     => arbitrary[Int].map(data.integer)
-    case ValueF(LongType, _)    => arbitrary[Long].map(data.long)
-    case ValueF(FloatType, _)   => arbitrary[Float].map(data.float)
-    case ValueF(DoubleType, _)  => arbitrary[Double].map(data.double)
-    case ValueF(TextType, _)    => Gen.asciiPrintableStr.map(data.text)
+    case ValueF(IntType, _)    => arbitrary[Int].map(data.integer)
+    case ValueF(LongType, _)   => arbitrary[Long].map(data.long)
+    case ValueF(FloatType, _)  => arbitrary[Float].map(data.float)
+    case ValueF(DoubleType, _) => arbitrary[Double].map(data.double)
+    case ValueF(TextType, _)   =>
+      // by default, no empty strings - generate empty strings only if the schema is optional
+      Gen.nonEmptyListOf[Char](Gen.asciiPrintableChar).map(cs => data.text(cs.mkString))
     case ValueF(BooleanType, _) => arbitrary[Boolean].map(data.boolean)
     case ValueF(BytesType, _)   => arbitrary[Array[Byte]].map(data.bytes)
 
@@ -93,8 +95,15 @@ object DataGen {
   }
 
   def optional(alg: Algebra[SchemaF, Gen[Data]]): Algebra[SchemaF, Gen[Data]] = Algebra { schema =>
+    Gen.asciiPrintableStr.map(data.text)
+
     if (schema.properties.get(Optional.key).contains(true.prop)) {
-      Gen.frequency(1 -> Gen.const(data.empty), 5 -> alg(schema))
+      schema match {
+        // Generate a mix of null and empty strings
+        case ValueF(TextType, _) =>
+          Gen.frequency(1 -> Gen.const(data.empty), 5 -> Gen.asciiPrintableStr.map(data.text))
+        case _ => Gen.frequency(1 -> Gen.const(data.empty), 5 -> alg(schema))
+      }
     } else {
       alg(schema)
     }
