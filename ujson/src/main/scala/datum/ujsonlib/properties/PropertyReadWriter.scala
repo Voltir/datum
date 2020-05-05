@@ -11,6 +11,7 @@ object PropertyReadWriter {
     case BoolPropF(value)    => ujson.Bool(value)
     case NumPropF(value)     => ujson.Num(value)
     case TextPropF(value)    => ujson.Str(value)
+    case ListPropF(vs)       => ujson.Arr.from(vs)
     case CollectionPropF(vs) => ujson.Obj.from(vs)
   }
 
@@ -20,6 +21,9 @@ object PropertyReadWriter {
     case ujson.Num(value) => NumPropF(value)
 
     case ujson.Bool(value) => BoolPropF(value)
+
+    case ujson.Arr(values) =>
+      ListPropF(values.toList)
 
     case ujson.Obj(fields) =>
       val builder = SortedMap.newBuilder[String, ujson.Value]

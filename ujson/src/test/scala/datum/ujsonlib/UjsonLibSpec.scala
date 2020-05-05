@@ -6,6 +6,7 @@ import datum.patterns.{data => d}
 import datum.patterns.data.Data
 import datum.patterns.schemas._
 import datum.patterns.{schemas => s}
+import datum.patterns.properties._
 import datum.modifiers.Optional
 import datum.ujsonlib.data.{JsReader, WriteJs}
 import datum.ujsonlib.implicits._
@@ -41,6 +42,20 @@ class UjsonLibSpec extends AnyWordSpec with Checkers with Matchers {
           parsed == schema
         }
       }
+    }
+
+    "roundtrip simple schema properties" in {
+      val schema: Schema = s.row("some" -> "prop".prop)(s.col("foo", s.value(TextType)))
+      val js = upickle.default.writeJs(schema)
+      val parsed = upickle.default.read[Schema](js)
+      parsed shouldBe schema
+    }
+
+    "roundtrip simple list properties" in {
+      val schema: Schema = s.row("some" -> ListProp(List("foo".prop, "bar".prop)))(s.col("foo", s.value(TextType)))
+      val js = upickle.default.writeJs(schema)
+      val parsed = upickle.default.read[Schema](js)
+      parsed shouldBe schema
     }
 
     "roundtrip a simple obj" in {

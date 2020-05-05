@@ -8,6 +8,7 @@ package object properties {
     case BoolPropF(b)           => BoolProp(b)
     case NumPropF(i)            => NumProp(i)
     case TextPropF(s)           => TextProp(s)
+    case ListPropF(s)           => ListProp(s)
     case CollectionPropF(props) => CollectionProp(props)
   }
 
@@ -15,6 +16,7 @@ package object properties {
     case BoolProp(b)           => BoolPropF(b)
     case NumProp(i)            => NumPropF(i)
     case TextProp(s)           => TextPropF(s)
+    case ListProp(props)       => ListPropF(props)
     case CollectionProp(props) => CollectionPropF(props)
   }
 
