@@ -18,6 +18,10 @@ object PropertiesReadWriter {
     case BoolPropF(v) => BooleanNode.valueOf(v)
     case NumPropF(v)  => DoubleNode.valueOf(v)
     case TextPropF(v) => TextNode.valueOf(v)
+    case ListPropF(vs) =>
+      val arr = objectMapper.createArrayNode()
+      vs.foreach(arr.add)
+      arr
     case CollectionPropF(vs) =>
       val obj = objectMapper.createObjectNode()
       vs.foreach { case (k, v) => obj.set(k, v) }
@@ -30,6 +34,8 @@ object PropertiesReadWriter {
       case JsonNodeType.BOOLEAN => BoolPropF(node.asBoolean())
       case JsonNodeType.NUMBER  => NumPropF(node.asDouble())
       case JsonNodeType.STRING  => TextPropF(node.asText())
+      case JsonNodeType.ARRAY =>
+        ListPropF(node.elements().asScala.toList)
       case JsonNodeType.OBJECT =>
         val builder = SortedMap.newBuilder[String, JsonNode]
         node.fields().asScala.foreach { entry =>

@@ -159,7 +159,7 @@ object SchemaGen {
     new SchemaGen(
       allowedValueTypes = Vector(IntType, BooleanType, TextType),
       next = Gen.const(AValue),
-      generateProperties = false
+      generateProperties = true
     )
 
   def optional(alg: CoalgebraM[Gen, SchemaF, Seed]): CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM { seed =>

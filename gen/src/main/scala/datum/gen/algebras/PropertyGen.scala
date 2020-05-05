@@ -14,6 +14,7 @@ object PropertyGen {
   case object ABoolProp extends Next
   case object ANumProp extends Next
   case object ATextProp extends Next
+  case object AListProp extends Next
   case object ACollectionProp extends Next
 
   case class Seed(next: Next, level: Int)
@@ -27,7 +28,8 @@ object PropertyGen {
   }
 
   private val genNext: Gen[Next] = Gen.frequency(
-    2 -> genPrimitive,
+    3 -> genPrimitive,
+    1 -> Gen.const(AListProp),
     1 -> Gen.const(ACollectionProp)
   )
 
@@ -46,6 +48,8 @@ object PropertyGen {
     case Seed(ABoolProp, _) => arbitrary[Boolean].map(BoolPropF)
     case Seed(ANumProp, _)  => arbitrary[Double].map(NumPropF)
     case Seed(ATextProp, _) => arbitrary[String].map(TextPropF)
+    case Seed(AListProp, level) =>
+      Gen.resize(3, Gen.nonEmptyListOf(nest(level))).map(ListPropF.apply)
     case Seed(ACollectionProp, level) =>
       val genProps = for {
         k <- Gen.resize(5, Gen.alphaLowerStr)
