@@ -98,6 +98,7 @@ class DataGenSpec extends AnyWordSpec with Checkers with Matchers {
         forAll { data: Data =>
           Fix.un[DataF](data) match {
             case TextValue(x) => !x.isEmpty
+            case _ => false
           }
         }
       }

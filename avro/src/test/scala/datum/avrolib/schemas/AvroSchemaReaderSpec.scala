@@ -107,7 +107,12 @@ class AvroSchemaReaderSpec extends AnyWordSpec with Checkers with Matchers {
         .endRecord()
 
       val read = AvroSchemaReader.read(avro)
-      pprint.pprintln(read)
+      read shouldBe a[ObjF[_]]
+      val keys = read.project match {
+        case ObjF(fields, _) => fields.keys.toSet
+        case _               => Set.empty
+      }
+      keys shouldBe Set("a", "b")
     }
 
     "be able to encode/decode an arbitrary schema to avro" in {
