@@ -54,8 +54,9 @@ object ApplyDefaults {
       case AttrF(default, schema) if schema.properties.contains(key) =>
         inp =>
           Fix.un[DataF](inp) match {
-            case data.EmptyValue => default
-            case _               => inp
+            case data.EmptyValue    => default
+            case data.TextValue("") => default
+            case _                  => inp
           }
 
       // Otherwise, just return the input

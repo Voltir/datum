@@ -131,6 +131,25 @@ class DefaultsSpec extends AnyWordSpec with Matchers {
       r2.values should contain allOf (data.empty, data.boolean(true), data.integer(42))
     }
 
+    "foo test foo" in {
+      val person: Schema = schemas.row()(
+        Column(schemas.value(TextType), Some("name")),
+        Column(schemas.value(BooleanType, defaults.use(true.prop)), Some("foo")),
+        Column(schemas.value(IntType, defaults.use(42.prop)), Some("age"))
+      )
+      val annotated = compiler.compile(person).right.get
+      val fn = ApplyDefaults.using(annotated,  defaults.modifiers.EnableColumnDefaultExpansion.algebra)
+
+      val sample: Data = data.row(
+        data.text("Bob"),
+        data.empty,
+      )
+
+      val r1 = Fix.un[DataF](fn(sample)).asInstanceOf[RowValue[Data]]
+
+      println(r1)
+    }
+
     "fail to compile an invalid obj schema" in {
       val schema: Schema = schemas.obj()("fail" -> schemas.value(IntType, defaults.use("not an int".prop)))
       compiler.compile(schema) shouldBe a[Left[_, _]]

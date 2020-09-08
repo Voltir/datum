@@ -3,7 +3,7 @@ val catsV = "2.0.0"
 val drosteV = "0.8.0"
 val scalaTestV = "3.1.0"
 
-lazy val scala212 = "2.12.10"
+lazy val scala212 = "2.12.12"
 
 lazy val supportedScalaVersions = List(scala212)
 
@@ -100,7 +100,7 @@ lazy val ujson = (project in file("ujson"))
   .settings(
     name := "datum-ujson",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.9.5"
+      "com.lihaoyi" %% "upickle" % "1.2.0"
     )
   )
   .settings(sonatypePublish)

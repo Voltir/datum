@@ -7,7 +7,7 @@ import datum.patterns.schemas._
 import datum.patterns.properties._
 import datum.modifiers.Optional
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.scalacheck.cats.implicits._
 import higherkindness.droste.{Algebra, AlgebraM, scheme}
 
