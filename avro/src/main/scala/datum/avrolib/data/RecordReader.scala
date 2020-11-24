@@ -30,8 +30,8 @@ object RecordReader {
         case (FloatType, v: Float)     => data.float(v)
         case (DoubleType, v: Double)   => data.double(v)
 
-        case (DateType, v: Utf8) =>
-          val date = LocalDate.parse(v, DateTimeFormatter.ISO_LOCAL_DATE)
+        case (DateType, v: Int) =>
+          val date = LocalDate.ofEpochDay(v)
           data.date(date)
 
         case (TimestampType, v: Long) =>

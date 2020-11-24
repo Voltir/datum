@@ -26,7 +26,7 @@ class AvroSchemaReaderSpec extends AnyWordSpec with Checkers with Matchers {
     }
 
     "read date types" in {
-      val schema = schemas.obj()("date" -> schemas.value(DateType))
+      val schema = schemas.obj()("date" -> schemas.value(DateType, "logicalType" -> TextProp("date")))
       val avro = AvroSchemaWriter.write(schema)
       val read = AvroSchemaReader.read(avro)
 
