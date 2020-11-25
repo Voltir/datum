@@ -57,7 +57,7 @@ class RecordWriterSpec extends AnyWordSpec with Checkers with Matchers {
       generic.get("text") shouldBe "foo"
       // generic.get("bytes") shouldBe Array(0.toByte, 255.toByte, 1.toByte)
       generic.get("bool") shouldBe true
-      generic.get("date") shouldBe LocalDate.of(1970, 1, 1).toString
+      generic.get("date") shouldBe LocalDate.of(1970, 1, 1).toEpochDay
       //generic.get("timestamp") shouldBe Instant.ofEpochSecond(1000)
       //generic.get("date_time") shouldBe LocalDateTime.of(1970, 1, 1, 10, 10, 10)
       generic.get("zoned_date_time") shouldBe ZonedDateTime.ofInstant(

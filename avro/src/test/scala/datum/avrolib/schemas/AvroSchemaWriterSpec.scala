@@ -28,7 +28,7 @@ class AvroSchemaWriterSpec extends AnyWordSpec with Checkers with Matchers {
       val schema = schemas.obj()("date" -> schemas.value(DateType))
       val avro = AvroSchemaWriter.write(schema)
 
-      avro.getField("date").schema().getProp(RECORD_TYPE_KEY) shouldBe "date"
+      avro.getField("date").schema().getLogicalType.getName shouldBe "date"
     }
 
     "encode unions" in {

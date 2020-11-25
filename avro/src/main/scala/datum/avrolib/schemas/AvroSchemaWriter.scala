@@ -14,7 +14,7 @@ object AvroSchemaWriter {
 
   def includeProps(avro: AvroSchema, props: PropertyMap): AvroSchema = {
     assert(!avro.isUnion, "Tried to includeProps on a union!")
-    props.foreach {
+    props.filterNot(_._1 == "logicalType").foreach {
       case (k, prop) =>
         avro.addProp(k, prop.toAvro)
     }
@@ -30,11 +30,7 @@ object AvroSchemaWriter {
     case ValueF(TextType, props)    => primitive(AvroSchema.Type.STRING, props)
     case ValueF(BytesType, props)   => primitive(AvroSchema.Type.BYTES, props)
 
-    case ValueF(DateType, props) =>
-      primitive(AvroSchema.Type.STRING, props).map { avro =>
-        avro.addProp(RECORD_TYPE_KEY, "date")
-        avro
-      }
+    case ValueF(DateType, props) => logical(AvroSchema.Type.INT, LogicalTypes.date(), props)
 
     case ValueF(TimestampType, props) => logical(AvroSchema.Type.LONG, LogicalTypes.timestampMillis(), props)
 
