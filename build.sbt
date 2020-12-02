@@ -10,7 +10,7 @@ lazy val supportedScalaVersions = List(scala212)
 // Settings
 lazy val commonSettings = Seq(
   name := "datum",
-  version := "0.5.5-SNAPSHOT", //not pubished
+  version := "0.5.6-SNAPSHOT", //not pubished
   scalaVersion := scala212,
   crossScalaVersions := supportedScalaVersions,
   organization := "io.github.voltir",
