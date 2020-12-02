@@ -2,10 +2,13 @@ package datum.avrolib.data
 
 import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 import datum.avrolib.data.errors.InvalidRecordOnRead
+import datum.avrolib.schemas.AVRO_LOGICAL_TYPE
 import datum.patterns.data
 import datum.patterns.data.Data
+import datum.patterns.properties.TextProp
 import datum.patterns.schemas._
 import higherkindness.droste.{Algebra, scheme}
 import org.apache.avro.generic.{GenericData, GenericRecord}
@@ -20,7 +23,7 @@ object RecordReader {
 
   val algebra: Algebra[SchemaF, AnyRef => Data] = {
 
-    def asData(tpe: Type, any: Any): Data = {
+    def asData(tpe: Type, any: Any, props: PropertyMap): Data = {
       (tpe, any) match {
         case (_, null)                 => data.empty
         case (IntType, v: Int)         => data.integer(v)
@@ -34,7 +37,10 @@ object RecordReader {
           val date = LocalDate.ofEpochDay(v)
           data.date(date)
 
-        case (TimestampType, v: Long) =>
+        case (TimestampType, v: Long) if props(AVRO_LOGICAL_TYPE) == TextProp("timestamp-micros") =>
+          data.timestamp(Instant.EPOCH.plus(v, ChronoUnit.MICROS))
+
+        case (TimestampType, v: Long) if props(AVRO_LOGICAL_TYPE) == TextProp("timestamp-millis") =>
           data.timestamp(Instant.ofEpochMilli(v))
 
         case (DateTimeType, v: Utf8) =>
@@ -55,9 +61,9 @@ object RecordReader {
     }
 
     Algebra {
-      case ValueF(tpe, _) =>
+      case ValueF(tpe, props) =>
         any =>
-          asData(tpe, any)
+          asData(tpe, any, props)
 
       case ObjF(fields, _) => {
         case generic: GenericRecord =>

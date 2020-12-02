@@ -14,4 +14,7 @@ package object schemas {
 
   // Used to encode if a header was never set
   val NO_HEADER = "datum.column.noheader"
+
+  // Logical type set and defined in avro based record formats (used for date and timestamps)
+  val AVRO_LOGICAL_TYPE = "logicalType"
 }
