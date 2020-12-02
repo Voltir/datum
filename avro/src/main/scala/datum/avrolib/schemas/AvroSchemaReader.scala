@@ -4,7 +4,7 @@ import datum.avrolib.properties._
 import datum.avrolib.schemas.errors.UnparseableAvroSchema
 import datum.patterns.properties.Property
 import higherkindness.droste.{Coalgebra, scheme}
-import org.apache.avro.LogicalTypes.{Date => DateLogicalType, TimestampMillis}
+import org.apache.avro.LogicalTypes.{TimestampMicros, TimestampMillis, Date => DateLogicalType}
 import org.apache.avro.util.internal.JacksonUtils
 import org.apache.avro.{Schema => AvroSchema}
 
@@ -15,7 +15,7 @@ object AvroSchemaReader {
 
   val coalgebra: Coalgebra[SchemaF, AvroSchema] = Coalgebra[SchemaF, AvroSchema] { avro =>
     avro.getType match {
-      case AvroSchema.Type.INT     =>
+      case AvroSchema.Type.INT =>
         avro.getLogicalType match {
           case _: DateLogicalType => ValueF(DateType, extractProps(avro))
           case _                  => ValueF(IntType, extractProps(avro))
@@ -34,6 +34,7 @@ object AvroSchemaReader {
       case AvroSchema.Type.LONG =>
         avro.getLogicalType match {
           case _: TimestampMillis => ValueF(TimestampType, extractProps(avro))
+          case _: TimestampMicros => ValueF(TimestampType, extractProps(avro))
           case _                  => ValueF(LongType, extractProps(avro))
         }
       case AvroSchema.Type.BYTES => ValueF(BytesType, extractProps(avro))

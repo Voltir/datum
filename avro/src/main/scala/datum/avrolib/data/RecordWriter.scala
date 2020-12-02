@@ -1,5 +1,6 @@
 package datum.avrolib.data
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 import datum.avrolib.data.errors.InvalidRecordOnWrite
 import datum.modifiers.Optional
@@ -41,14 +42,15 @@ class RecordWriter(toAvro: Schema => AvroSchema) {
 
     def extract(tpe: Type, d: DataF[Data]): Any = {
       (tpe, d) match {
-        case (IntType, data.IntValue(v))                     => v
-        case (TextType, data.TextValue(v))                   => v
-        case (LongType, data.LongValue(v))                   => v
-        case (BooleanType, data.BooleanValue(v))             => v
-        case (DoubleType, data.DoubleValue(v))               => v
-        case (FloatType, data.FloatValue(v))                 => v
-        case (DateType, data.DateValue(v))                   => v.toEpochDay.toInt
-        case (TimestampType, data.TimestampValue(v))         => v.toEpochMilli //expects millis
+        case (IntType, data.IntValue(v))         => v
+        case (TextType, data.TextValue(v))       => v
+        case (LongType, data.LongValue(v))       => v
+        case (BooleanType, data.BooleanValue(v)) => v
+        case (DoubleType, data.DoubleValue(v))   => v
+        case (FloatType, data.FloatValue(v))     => v
+        case (DateType, data.DateValue(v))       => v.toEpochDay.toInt
+        case (TimestampType, data.TimestampValue(v)) =>
+          TimeUnit.SECONDS.toMicros(v.getEpochSecond()) + TimeUnit.NANOSECONDS.toMicros(v.getNano()) // expects micros
         case (DateTimeType, data.LocalDateTimeValue(v))      => v.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         case (ZonedDateTimeType, data.ZonedDateTimeValue(v)) => v.format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
         case (BytesType, data.BytesValue(v))                 => java.nio.ByteBuffer.wrap(v)

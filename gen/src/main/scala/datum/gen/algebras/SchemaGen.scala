@@ -1,5 +1,6 @@
 package datum.gen.algebras
 import datum.modifiers.Optional
+import datum.patterns.properties.TextProp
 import datum.patterns.schemas._
 import org.scalacheck.Gen
 import org.scalacheck.cats.implicits._
@@ -38,8 +39,9 @@ class SchemaGen(
     } else gen
   }
 
-  private val genValue: Gen[SchemaF[Seed]] = Gen.oneOf(allowedValueTypes).map { x =>
-    ValueF(x)
+  private val genValue: Gen[SchemaF[Seed]] = Gen.oneOf(allowedValueTypes).map {
+    case TimestampType => ValueF(TimestampType, Map("logicalType" -> TextProp("timestamp-micros")))
+    case x             => ValueF(x)
   }
   private def genObj(level: Int): Gen[SchemaF[Seed]] = {
     val genField = for {
@@ -106,11 +108,11 @@ class SchemaGen(
   }
 
   val coalgebra: CoalgebraM[Gen, SchemaF, Seed] = CoalgebraM {
-    case Seed(AValue, _)             => addProperties(genValue)
-    case Seed(AnObj, level)          => addProperties(genObj(level))
-    case Seed(ARow, level)           => addProperties(genRow(level))
-    case Seed(AUnion, level)         => addProperties(genUnion(level))
-    case Seed(AnArray, level)        => addProperties(genArray(level))
+    case Seed(AValue, _)      => addProperties(genValue)
+    case Seed(AnObj, level)   => addProperties(genObj(level))
+    case Seed(ARow, level)    => addProperties(genRow(level))
+    case Seed(AUnion, level)  => addProperties(genUnion(level))
+    case Seed(AnArray, level) => addProperties(genArray(level))
   }
 }
 

@@ -1,5 +1,7 @@
 package datum.avrolib.util
 
+import datum.avrolib.schemas.AVRO_LOGICAL_TYPE
+import datum.patterns.properties.TextProp
 import datum.patterns.schemas._
 
 object TestSchemas {
@@ -13,7 +15,7 @@ object TestSchemas {
     "bytes" -> value(BytesType),
     "bool" -> value(BooleanType),
     "date" -> value(DateType),
-    "timestamp" -> value(TimestampType),
+    "timestamp" -> value(TimestampType, AVRO_LOGICAL_TYPE -> TextProp("timestamp-micros")),
     "date_time" -> value(DateTimeType),
     "zoned_date_time" -> value(ZonedDateTimeType)
   )
