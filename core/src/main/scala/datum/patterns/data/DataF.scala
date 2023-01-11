@@ -6,7 +6,6 @@ import cats.{Applicative, Traverse}
 import higherkindness.droste.util.DefaultTraverse
 import cats.instances.sortedMap._
 import cats.instances.vector._
-import cats.instances.string._
 
 import scala.collection.immutable.SortedMap
 
@@ -45,7 +44,7 @@ object DataF {
     override def traverse[G[_], A, B](fa: DataF[A])(f: A => G[B])(implicit G: Applicative[G]): G[DataF[B]] = {
       fa match {
         case ObjValue(fields) =>
-          val tm = Traverse[SortedMap[String, ?]].traverse(fields)(f)
+          val tm = Traverse[SortedMap[String, *]].traverse(fields)(f)
           G.map(tm)(ObjValue.apply)
 
         case RowValue(vs) =>

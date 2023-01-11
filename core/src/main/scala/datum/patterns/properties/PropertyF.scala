@@ -1,6 +1,5 @@
 package datum.patterns.properties
 import cats.{Applicative, Traverse}
-import cats.instances.string._
 import cats.instances.sortedMap._
 import cats.instances.list._
 
@@ -27,7 +26,7 @@ object PropertyF {
           val traversed = Traverse[List].traverse(properties)(f)
           G.map(traversed)(ListPropF.apply)
         case CollectionPropF(properties) =>
-          val traversed = Traverse[SortedMap[String, ?]].traverse(properties)(f)
+          val traversed = Traverse[SortedMap[String, *]].traverse(properties)(f)
           G.map(traversed)(CollectionPropF.apply)
       }
     }

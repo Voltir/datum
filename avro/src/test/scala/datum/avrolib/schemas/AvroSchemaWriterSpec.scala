@@ -1,5 +1,6 @@
 package datum.avrolib.schemas
 import datum.gen.algebras.SchemaGen
+import datum.patterns.properties.{BoolProp, CollectionProp}
 import datum.patterns.schemas
 import datum.patterns.schemas._
 import org.apache.avro.{Schema => AvroSchema}
@@ -37,6 +38,18 @@ class AvroSchemaWriterSpec extends AnyWordSpec with Checkers with Matchers {
       avro.getType shouldBe AvroSchema.Type.RECORD
       avro.getField("union") shouldNot be(null)
       avro.getField("union").schema().getType shouldBe AvroSchema.Type.UNION
+    }
+
+    "encode collection props" in {
+      val simple =
+        schemas.value(
+          IntType,
+          "" -> CollectionProp(scala.collection.immutable.SortedMap("foo" -> BoolProp(true)))
+        )
+
+      noException shouldBe thrownBy {
+        AvroSchemaWriter.write(simple)
+      }
     }
 
     "encode arbitrary schemas" in {

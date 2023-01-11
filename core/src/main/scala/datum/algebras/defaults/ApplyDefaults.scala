@@ -8,8 +8,8 @@ import higherkindness.droste.{Algebra, scheme}
 
 object ApplyDefaults {
 
-  val algebra: Algebra[AttrF[SchemaF, Data, ?], Data => Data] =
-    Algebra[AttrF[SchemaF, Data, ?], Data => Data] {
+  val algebra: Algebra[AttrF[SchemaF, Data, *], Data => Data] =
+    Algebra[AttrF[SchemaF, Data, *], Data => Data] {
       // handle cases for `ObjF`s that can either themselves be missing, or contain missing fields
       case AttrF(_, ObjF(schemaFields, _)) =>
         inp =>
@@ -65,11 +65,11 @@ object ApplyDefaults {
 
   def using(
     annotated: Attr[SchemaF, Data],
-    extensions: Algebra[AttrF[SchemaF, Data, ?], Data => Data]*
+    extensions: Algebra[AttrF[SchemaF, Data, *], Data => Data]*
   ): Data => Data = {
     val makeFn =
       if (extensions.nonEmpty) {
-        val extendedAlgebra = Algebra[AttrF[SchemaF, Data, ?], Data => Data] { schemaWithDefaults =>
+        val extendedAlgebra = Algebra[AttrF[SchemaF, Data, *], Data => Data] { schemaWithDefaults =>
           (algebra +: extensions).map(_.run(schemaWithDefaults)).reduceLeft(_ andThen _)
         }
         scheme.cata(extendedAlgebra)
