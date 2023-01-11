@@ -1,5 +1,5 @@
 package datum.avrolib.properties
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import datum.patterns.properties._
 import higherkindness.droste.{Algebra, Coalgebra}
@@ -7,11 +7,11 @@ import higherkindness.droste.{Algebra, Coalgebra}
 import scala.collection.immutable.SortedMap
 import scala.collection.JavaConverters._
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
+
 object PropertiesReadWriter {
 
   case class InvalidPropertyDefinition(msg: String) extends Exception(msg)
-
-  private val objectMapper = new ObjectMapper
 
   // writer algebra
   val algebra: Algebra[PropertyF, JsonNode] = Algebra {
@@ -19,12 +19,12 @@ object PropertiesReadWriter {
     case NumPropF(v)  => DoubleNode.valueOf(v)
     case TextPropF(v) => TextNode.valueOf(v)
     case ListPropF(vs) =>
-      val arr = objectMapper.createArrayNode()
+      val arr = JsonNodeFactory.instance.arrayNode()
       vs.foreach(arr.add)
       arr
     case CollectionPropF(vs) =>
-      val obj = objectMapper.createObjectNode()
-      vs.foreach { case (k, v) => obj.set(k, v) }
+      val obj = JsonNodeFactory.instance.objectNode()
+      vs.foreach { case (k, v) => obj.replace(k, v) }
       obj
   }
 

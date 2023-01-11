@@ -26,7 +26,7 @@ class UjsonLibSpec extends AnyWordSpec with Checkers with Matchers {
     generateUsing(schema)
   }
 
-  val reader = JsReader[Either[Throwable, ?]]
+  val reader = JsReader[Either[Throwable, *]]
 
   "UJson Lib" should {
     "be able to encode/decode an arbitrary schema to json" in {

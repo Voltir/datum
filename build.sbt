@@ -1,21 +1,21 @@
 // Versions
-val catsV = "2.0.0"
-val drosteV = "0.8.0"
+val catsV = "2.9.0"
+val drosteV = "0.9.0"
 val scalaTestV = "3.1.0"
 
-lazy val scala212 = "2.12.12"
+lazy val scala212 = "2.12.14"
 
 lazy val supportedScalaVersions = List(scala212)
 
 // Settings
 lazy val commonSettings = Seq(
   name := "datum",
-  version := "0.5.6-SNAPSHOT", //not pubished
+  version := "0.6.0-SNAPSHOT",
   scalaVersion := scala212,
   crossScalaVersions := supportedScalaVersions,
   organization := "io.github.voltir",
-  resolvers += Resolver.sonatypeRepo("releases"),
-  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full),
+  resolvers ++= Resolver.sonatypeOssRepos("releases"),
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full),
   scalacOptions ++= Seq(
     "-Xlint",
     "-deprecation",
@@ -50,7 +50,7 @@ lazy val datum = (project in file("."))
     skip in publish := true,
     // must be set to nil to avoid double publishing
     crossScalaVersions := Nil,
-    sonatypeProfileName := "io.github.voltir"
+    //sonatypeProfileName := "io.github.voltir"
   )
   .aggregate(core, gen, testCore, ujson, avro)
 
@@ -78,7 +78,7 @@ lazy val avro = (project in file("avro"))
   .settings(
     name := "datum-avro",
     libraryDependencies ++= Seq(
-      "org.apache.avro" % "avro" % "1.9.0",
+      "org.apache.avro" % "avro" % "1.9.2",
       "org.xerial.snappy" % "snappy-java" % "1.1.7.3" % Test
     )
   )
@@ -113,7 +113,7 @@ val sonatypePublish = Seq(
   publishArtifact.in(Test) := false,
   pomIncludeRepository := Function.const(false),
   homepage := Some(url("https://github.com/Voltir/datum")),
-  sonatypeProfileName := "io.github.voltir",
+  //sonatypeProfileName := "io.github.voltir",
   licenses += ("MIT license", url("http://www.opensource.org/licenses/mit-license.php")),
   scmInfo := Some(
     ScmInfo(

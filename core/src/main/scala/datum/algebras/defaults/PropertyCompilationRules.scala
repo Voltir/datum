@@ -64,5 +64,5 @@ class DefaultPropertyToDefaultRules[M[_]](implicit val M: MonadError[M, Throwabl
   with HasMonadError[M]
 
 object DefaultPropertyToDefaultRules {
-  val either = new DefaultPropertyToDefaultRules[Either[Throwable, ?]]
+  val either = new DefaultPropertyToDefaultRules[Either[Throwable, *]]
 }

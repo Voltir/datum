@@ -2,7 +2,6 @@ package datum.patterns.schemas
 
 import cats.{Applicative, Traverse}
 import cats.instances.sortedMap._
-import cats.instances.string._
 import cats.instances.vector._
 import datum.patterns.properties.Property
 import higherkindness.droste.util.DefaultTraverse
@@ -67,11 +66,11 @@ object SchemaF {
           G.map(tl)(x => RowF(x, props))
 
         case ObjF(fields, props) =>
-          val tm = Traverse[SortedMap[String, ?]].traverse(fields)(f)
+          val tm = Traverse[SortedMap[String, *]].traverse(fields)(f)
           G.map(tm)(x => ObjF(x, props))
 
         case UnionF(alts, attrs) =>
-          val tm = Traverse[SortedMap[String, ?]].traverse(alts)(f)
+          val tm = Traverse[SortedMap[String, *]].traverse(alts)(f)
           G.map(tm)(x => UnionF(x, attrs))
 
         case ArrayF(e, meta) => G.map(f(e))(x => ArrayF(x, meta))

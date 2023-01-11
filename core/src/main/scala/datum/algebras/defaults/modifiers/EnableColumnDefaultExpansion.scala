@@ -42,8 +42,8 @@ object EnableColumnDefaultExpansion {
     data.row(results.toVector)
   }
 
-  val algebra: Algebra[AttrF[SchemaF, Data, ?], Data => Data] =
-    Algebra[AttrF[SchemaF, Data, ?], Data => Data] {
+  val algebra: Algebra[AttrF[SchemaF, Data, *], Data => Data] =
+    Algebra[AttrF[SchemaF, Data, *], Data => Data] {
       case AttrF(_, RowF(elements, _)) =>
         inp =>
           Fix.un[DataF](inp) match {
