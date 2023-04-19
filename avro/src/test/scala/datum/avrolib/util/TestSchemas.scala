@@ -16,6 +16,7 @@ object TestSchemas {
     "bool" -> value(BooleanType),
     "date" -> value(DateType),
     "timestamp" -> value(TimestampType, AVRO_LOGICAL_TYPE -> TextProp("timestamp-micros")),
+    "timestamp" -> value(TimestampType),
     "date_time" -> value(DateTimeType),
     "zoned_date_time" -> value(ZonedDateTimeType)
   )

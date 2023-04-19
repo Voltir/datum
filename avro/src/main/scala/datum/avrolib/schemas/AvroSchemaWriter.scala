@@ -32,7 +32,12 @@ object AvroSchemaWriter {
 
     case ValueF(DateType, props) => logical(AvroSchema.Type.INT, LogicalTypes.date(), props)
 
-    case ValueF(TimestampType, props) => logical(AvroSchema.Type.LONG, LogicalTypes.timestampMicros(), props)
+    case ValueF(TimestampType, props) =>
+      if (props.get(AVRO_LOGICAL_TYPE).contains("timestamp-millis".prop)) {
+        logical(AvroSchema.Type.LONG, LogicalTypes.timestampMillis(), props)
+      } else {
+        logical(AvroSchema.Type.LONG, LogicalTypes.timestampMicros(), props)
+      }
 
     case ValueF(DateTimeType, props) =>
       primitive(AvroSchema.Type.STRING, props).map { avro =>

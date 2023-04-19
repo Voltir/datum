@@ -2,7 +2,7 @@ package datum.avrolib.schemas
 import datum.patterns.schemas._
 import datum.avrolib.properties._
 import datum.avrolib.schemas.errors.UnparseableAvroSchema
-import datum.patterns.properties.Property
+import datum.patterns.properties.{Property, TextProp}
 import higherkindness.droste.{Coalgebra, scheme}
 import org.apache.avro.LogicalTypes.{TimestampMicros, TimestampMillis, Date => DateLogicalType}
 import org.apache.avro.util.internal.JacksonUtils
@@ -33,9 +33,11 @@ object AvroSchemaReader {
         }
       case AvroSchema.Type.LONG =>
         avro.getLogicalType match {
-          case _: TimestampMillis => ValueF(TimestampType, extractProps(avro))
-          case _: TimestampMicros => ValueF(TimestampType, extractProps(avro))
-          case _                  => ValueF(LongType, extractProps(avro))
+          case _: TimestampMillis =>
+            ValueF(TimestampType, extractProps(avro) + (AVRO_LOGICAL_TYPE -> TextProp("timestamp-millis")))
+          case _: TimestampMicros =>
+            ValueF(TimestampType, extractProps(avro) + (AVRO_LOGICAL_TYPE -> TextProp("timestamp-micros")))
+          case _ => ValueF(LongType, extractProps(avro))
         }
       case AvroSchema.Type.BYTES => ValueF(BytesType, extractProps(avro))
 

@@ -37,11 +37,12 @@ object RecordReader {
           val date = LocalDate.ofEpochDay(v)
           data.date(date)
 
-        case (TimestampType, v: Long) if props(AVRO_LOGICAL_TYPE) == TextProp("timestamp-micros") =>
-          data.timestamp(Instant.EPOCH.plus(v, ChronoUnit.MICROS))
-
-        case (TimestampType, v: Long) if props(AVRO_LOGICAL_TYPE) == TextProp("timestamp-millis") =>
+        case (TimestampType, v: Long) if props.get(AVRO_LOGICAL_TYPE).contains(TextProp("timestamp-millis")) =>
           data.timestamp(Instant.ofEpochMilli(v))
+
+        // Assume micros if a logical type is not otherwise specified
+        case (TimestampType, v: Long) =>
+          data.timestamp(Instant.EPOCH.plus(v, ChronoUnit.MICROS))
 
         case (DateTimeType, v: Utf8) =>
           val date = LocalDateTime.parse(v, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
